@@ -103,11 +103,11 @@ export default function App() {
     if (!search.trim()) return;
     setLoading(true); setResults(null); setSelectedProduct(null); setError("");
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": API_KEY,
+           
           "anthropic-version": "2023-06-01",
           "anthropic-dangerous-direct-browser-access": "true"
         },
