@@ -105,10 +105,7 @@ export default function App() {
       const response = await fetch("/api/search", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-           
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true"
+          "Content-Type": "application/json", 
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
