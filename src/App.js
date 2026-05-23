@@ -266,7 +266,7 @@ export default function App() {
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <span style={{fontSize:16,fontWeight:500,color:i===0?accent:"#333"}}>${p.price.toFixed(2)}</span>
-                      <a href="#" style={{fontSize:12,color:accent,textDecoration:"none",border:`1px solid ${accent}`,borderRadius:6,padding:"4px 10px"}}>View →</a>
+                      <a href="https://google.com" style={{fontSize:12,color:accent,textDecoration:"none",border:`1px solid ${accent}`,borderRadius:6,padding:"4px 10px"}}>View →</a>
                     </div>
                   </div>
                 ))}
