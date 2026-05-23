@@ -71,7 +71,6 @@ const INIT_USERS = {
   BudgetPawrent: { deals:1, upvotes:5 },
 };
 
-const API_KEY = process.env.REACT_APP_ANTHROPIC_KEY;
 
 export default function App() {
   const [tab, setTab] = useState("search");
