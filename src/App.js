@@ -108,7 +108,7 @@ export default function App() {
           "Content-Type": "application/json", 
         },
         body: JSON.stringify({
-          model: "claude-3-haiku-20240307
+          model: "claude-3-haiku-20240307",
           max_tokens: 1000,
           messages: [{
             role: "user",
