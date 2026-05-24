@@ -117,6 +117,7 @@ export default function App() {
         })
       });
       const data = await response.json();
+      if (!data.content) throw new Error(JSON.stringify(data));
       const text = data.content.map(c => c.text || "").join("");
       const clean = text.replace(/```json|```/g,"").trim();
       const parsed = JSON.parse(clean);
