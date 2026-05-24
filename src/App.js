@@ -122,7 +122,7 @@ export default function App() {
       const parsed = JSON.parse(clean);
       setResults(parsed);
     } catch(e) {
-      setError("Search failed. Please try again.");
+      setError("Error: " + e.message);
     }
     setLoading(false);
   }
