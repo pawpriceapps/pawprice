@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const DOG_SVG = (
   <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
@@ -71,13 +71,9 @@ const INIT_USERS = {
   BudgetPawrent: { deals:1, upvotes:5 },
 };
 
-
 export default function App() {
   const [tab, setTab] = useState("search");
   const [pet, setPet] = useState("dogs");
-  const [petName, setPetName] = useState("");
-  const [petNameInput, setPetNameInput] = useState("");
-  const [nameSaved, setNameSaved] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -91,11 +87,40 @@ export default function App() {
   const [myUsername, setMyUsername] = useState("");
   const [sortDeals, setSortDeals] = useState("newest");
 
+  // My Pets state
+  const [myPets, setMyPets] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pawprice_pets") || "[]"); } catch { return []; }
+  });
+  const [petForm, setPetForm] = useState({ name: "", type: "dogs", food: "" });
+  const [petSaved, setPetSaved] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("pawprice_pets", JSON.stringify(myPets));
+  }, [myPets]);
+
   const accent = pet === "dogs" ? "#EF9F27" : "#7F77DD";
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
 
-  function saveName() {
-    if (petNameInput.trim()) { setPetName(petNameInput.trim()); setNameSaved(true); setTimeout(()=>setNameSaved(false),2000); }
+  function addPet() {
+    if (!petForm.name.trim() || !petForm.food.trim()) return;
+    const newPet = { id: Date.now(), ...petForm };
+    setMyPets(prev => [...prev, newPet]);
+    setPetForm({ name: "", type: "dogs", food: "" });
+    setPetSaved(true);
+    setTimeout(() => setPetSaved(false), 2000);
+  }
+
+  function deletePet(id) {
+    setMyPets(prev => prev.filter(p => p.id !== id));
+  }
+
+  function searchForPet(p) {
+    setPet(p.type);
+    setSearch(p.food);
+    setTab("search");
+    setResults(null);
+    setSelectedProduct(null);
+    setError("");
   }
 
   async function searchProducts() {
@@ -104,9 +129,7 @@ export default function App() {
     try {
       const response = await fetch("/api/search", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json", 
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
@@ -123,7 +146,7 @@ export default function App() {
       const parsed = JSON.parse(clean);
       setResults(parsed);
     } catch(e) {
-      setError("Error: " + e.message);
+      setError("Search failed: " + e.message);
     }
     setLoading(false);
   }
@@ -153,79 +176,70 @@ export default function App() {
   const leaderboard = Object.entries(users).map(([name,data])=>({name,...data,score:data.deals*3+data.upvotes})).sort((a,b)=>b.score-a.score);
 
   const tabStyle = (t) => ({
-    padding:"8px 18px", borderRadius:"20px", border:"none", cursor:"pointer", fontWeight:500, fontSize:14,
+    padding:"8px 14px", borderRadius:"20px", border:"none", cursor:"pointer", fontWeight:500, fontSize:13,
     background: tab===t ? accent : "transparent",
     color: tab===t ? "white" : "#666", transition:"all 0.2s"
   });
 
   return (
     <div style={{fontFamily:"sans-serif",maxWidth:720,margin:"0 auto",padding:"1rem 1rem 2rem"}}>
-      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:8}}>
+      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
         <div style={{flexShrink:0}}>{pet==="dogs"?DOG_SVG:CAT_SVG}</div>
         <div style={{flex:1}}>
           <div style={{fontSize:26,fontWeight:500,lineHeight:1}}>🐾 PawPrice</div>
           <div style={{fontSize:14,color:"#666",marginTop:4}}>AI-powered pet food price comparison</div>
-          {petName && <div style={{marginTop:6,fontSize:13,background:accentLight,color:accent,borderRadius:8,padding:"3px 10px",display:"inline-block",fontWeight:500}}>Searching for {petName} 🐾</div>}
         </div>
       </div>
 
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,flexWrap:"wrap"}}>
-        <div style={{display:"flex",background:"#f0f0f0",borderRadius:20,padding:3}}>
-          {["dogs","cats"].map(p=>(
-            <button key={p} onClick={()=>{setPet(p);setResults(null);setSelectedProduct(null);setSearch("");}}
-              style={{padding:"6px 20px",borderRadius:18,border:"none",cursor:"pointer",fontWeight:500,fontSize:13,
-                background:pet===p?(p==="dogs"?"#EF9F27":"#7F77DD"):"transparent",
-                color:pet===p?"white":"#666",transition:"all 0.2s"}}>
-              {p==="dogs"?"🐶 Dogs":"🐱 Cats"}
-            </button>
-          ))}
-        </div>
-        <input value={petNameInput} onChange={e=>setPetNameInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&saveName()}
-          placeholder={`Name your ${pet==="dogs"?"pup":"kitty"}…`}
-          style={{padding:"7px 12px",borderRadius:20,border:"1px solid #ddd",fontSize:13,width:160}}/>
-        <button onClick={saveName}
-          style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${accent}`,background:"transparent",color:accent,cursor:"pointer",fontSize:13,fontWeight:500}}>
-          {nameSaved?"Saved ✓":"Save name"}
-        </button>
-      </div>
-
-      <div style={{display:"flex",gap:6,marginBottom:20,background:"#f5f5f5",padding:4,borderRadius:24}}>
-        {[["search","Search Prices"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
+      <div style={{display:"flex",gap:4,marginBottom:20,background:"#f5f5f5",padding:4,borderRadius:24,flexWrap:"wrap"}}>
+        {[["search","Search Prices"],["mypets","My Pets"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
           <button key={t} style={tabStyle(t)} onClick={()=>setTab(t)}>{l}</button>
         ))}
       </div>
 
       {tab==="search" && (
         <div>
+          <div style={{display:"flex",gap:8,marginBottom:12}}>
+            <div style={{display:"flex",background:"#f0f0f0",borderRadius:20,padding:3}}>
+              {["dogs","cats"].map(p=>(
+                <button key={p} onClick={()=>{setPet(p);setResults(null);setSelectedProduct(null);setSearch("");}}
+                  style={{padding:"6px 16px",borderRadius:18,border:"none",cursor:"pointer",fontWeight:500,fontSize:13,
+                    background:pet===p?(p==="dogs"?"#EF9F27":"#7F77DD"):"transparent",
+                    color:pet===p?"white":"#666",transition:"all 0.2s"}}>
+                  {p==="dogs"?"🐶 Dogs":"🐱 Cats"}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {!selectedProduct ? (
             <>
-              <div style={{display:"flex",gap:8,marginBottom:16}}>
+              <div style={{display:"flex",gap:8,marginBottom:12}}>
                 <input value={search} onChange={e=>setSearch(e.target.value)}
                   onKeyDown={e=>e.key==="Enter"&&searchProducts()}
-                  placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food — brand, flavor, size…`}
+                  placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food…`}
                   style={{flex:1,padding:"11px 16px",borderRadius:12,border:`1.5px solid ${accent}`,fontSize:14,outline:"none"}}/>
                 <button onClick={searchProducts} disabled={loading}
                   style={{padding:"11px 22px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,opacity:loading?0.7:1}}>
-                  {loading?"Searching…":"Search"}
+                  {loading?"…":"Search"}
                 </button>
               </div>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16,fontSize:12,color:"#666"}}>
                 <span style={{background:accentLight,color:accent,padding:"3px 10px",borderRadius:10,fontWeight:500}}>✨ AI-powered</span>
-                <span>Search any pet food — real brands, realistic price comparisons across 6 major retailers</span>
+                <span>Real brands, realistic prices across 6 major retailers</span>
               </div>
               {error && <div style={{color:"#E24B4A",fontSize:14,marginBottom:12}}>{error}</div>}
               {loading && (
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:32,marginBottom:8}}>🔍</div>
-                  <div style={{fontSize:15,fontWeight:500,color:accent}}>Comparing prices across stores…</div>
-                  <div style={{fontSize:13,marginTop:4}}>Checking PetSmart, Petco, Walmart, Chewy, Amazon and Target</div>
+                  <div style={{fontSize:15,fontWeight:500,color:accent}}>Comparing prices…</div>
                 </div>
               )}
               {!loading && !results && (
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:40,marginBottom:8}}>{pet==="dogs"?"🐶":"🐱"}</div>
                   <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>Search any pet food</div>
-                  <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult", "Purina Pro Plan kitten", "grain free salmon"</div>
+                  <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult", "Purina Pro Plan kitten"</div>
                 </div>
               )}
               {results && results.map((prod,i)=>{
@@ -272,6 +286,66 @@ export default function App() {
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {tab==="mypets" && (
+        <div>
+          <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"16px 18px",marginBottom:18}}>
+            <div style={{fontWeight:500,fontSize:15,marginBottom:12}}>Add a Pet</div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <input value={petForm.name} onChange={e=>setPetForm({...petForm,name:e.target.value})}
+                placeholder="Pet name (e.g. Max)"
+                style={{padding:"9px 12px",borderRadius:8,border:"1px solid #ddd",fontSize:14}}/>
+              <div style={{display:"flex",background:"#f0f0f0",borderRadius:20,padding:3,width:"fit-content"}}>
+                {["dogs","cats"].map(p=>(
+                  <button key={p} onClick={()=>setPetForm({...petForm,type:p})}
+                    style={{padding:"6px 20px",borderRadius:18,border:"none",cursor:"pointer",fontWeight:500,fontSize:13,
+                      background:petForm.type===p?(p==="dogs"?"#EF9F27":"#7F77DD"):"transparent",
+                      color:petForm.type===p?"white":"#666",transition:"all 0.2s"}}>
+                    {p==="dogs"?"🐶 Dog":"🐱 Cat"}
+                  </button>
+                ))}
+              </div>
+              <input value={petForm.food} onChange={e=>setPetForm({...petForm,food:e.target.value})}
+                placeholder="Favourite food (e.g. Purina Pro Plan)"
+                style={{padding:"9px 12px",borderRadius:8,border:"1px solid #ddd",fontSize:14}}/>
+              <button onClick={addPet}
+                style={{padding:"9px 22px",borderRadius:8,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,width:"fit-content"}}>
+                {petSaved ? "Saved! ✓" : "Save Pet"}
+              </button>
+            </div>
+          </div>
+
+          {myPets.length === 0 ? (
+            <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
+              <div style={{fontSize:40,marginBottom:8}}>🐾</div>
+              <div style={{fontSize:15,fontWeight:500}}>No pets saved yet</div>
+              <div style={{fontSize:13,marginTop:4}}>Add your first pet above!</div>
+            </div>
+          ) : (
+            myPets.map(p=>(
+              <div key={p.id} style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                    <span style={{fontSize:20}}>{p.type==="dogs"?"🐶":"🐱"}</span>
+                    <span style={{fontWeight:500,fontSize:16}}>{p.name}</span>
+                  </div>
+                  <div style={{fontSize:13,color:"#666"}}>Favourite: {p.food}</div>
+                </div>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>searchForPet(p)}
+                    style={{padding:"7px 14px",borderRadius:8,background:p.type==="dogs"?"#EF9F27":"#7F77DD",color:"white",border:"none",cursor:"pointer",fontSize:13,fontWeight:500}}>
+                    Search
+                  </button>
+                  <button onClick={()=>deletePet(p.id)}
+                    style={{padding:"7px 12px",borderRadius:8,background:"transparent",color:"#999",border:"1px solid #ddd",cursor:"pointer",fontSize:13}}>
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))
           )}
         </div>
       )}
