@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { useState, useEffect } from "react";
 
 const DOG_SVG = (
@@ -437,5 +438,10 @@ export default function App() {
         </div>
       )}
     </div>
+
+<Analytics />
+    </div>
+  );
+}
   );
 }
