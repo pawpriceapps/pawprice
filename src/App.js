@@ -52,7 +52,8 @@ const CAT_SVG = (
   </svg>
 );
 
-const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target"];
+const STORES = ["PetSmart", "Petco", "Walmart", "Chewy", "Amazon", "Target", "Rural King", "Tractor Supply"];
+
 const BADGES = [
   { min:0, max:0, label:"Pup", icon:"🐶" },
   { min:1, max:4, label:"Bone Collector", icon:"🦴" },
@@ -64,7 +65,7 @@ function getBadge(count) { return BADGES.find(b => count >= b.min && count <= b.
 const INIT_DEALS = [
   { id:1, user:"PawHunterMike", pet:"dogs", store:"Walmart", product:"Purina Pro Plan 35lb", price:"$62.00", location:"Denver, CO", upvotes:14, ts: Date.now()-3600000 },
   { id:2, user:"CatLadyJess", pet:"cats", store:"Petco", product:"Blue Buffalo 12lb", price:"$27.50", location:"Austin, TX", upvotes:9, ts: Date.now()-7200000 },
-  { id:3, user:"BudgetPawrent", pet:"dogs", store:"Target", product:"Hill's Science Diet 15lb", price:"$39.99", location:"Chicago, IL", upvotes:5, ts: Date.now()-86400000 },
+  { id:3, user:"BudgetPawrent", pet:"dogs", store:"Tractor Supply", product:"Hill's Science Diet 15lb", price:"$39.99", location:"Chicago, IL", upvotes:5, ts: Date.now()-86400000 },
 ];
 const INIT_USERS = {
   PawHunterMike: { deals:3, upvotes:28 },
@@ -133,10 +134,26 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
-          max_tokens: 1000,
+          max_tokens: 1500,
           messages: [{
             role: "user",
-            content: `You are a pet food price comparison assistant. The user is searching for "${search}" for their ${pet}. Return a JSON array of up to 4 matching pet food products. Each product must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), and prices array with store and price for: ${STORES.join(", ")}. Make prices realistic and varied. Return ONLY valid JSON, no markdown, no explanation. Example: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Buffalo","type":"Dry","size":"30 lb","stage":"Adult","prices":[{"store":"PetSmart","price":62.99},{"store":"Petco","price":64.49},{"store":"Walmart","price":58.97},{"store":"Chewy","price":59.98},{"store":"Amazon","price":61.50},{"store":"Target","price":63.49}]}]`
+            content: `You are a pet food price comparison assistant. The user is searching for "${search}" for their ${pet}.
+
+STRICT RULES - follow exactly:
+1. Only return products that ACTUALLY EXIST and are made for ${pet}. Never invent or fabricate products.
+2. NEVER mix brands with animal types they don't serve. Examples: Friskies, Fancy Feast, and Meow Mix are CAT-ONLY brands. Pedigree, Purina Puppy Chow, Milk-Bone, and Ol' Roy are DOG-ONLY brands. If the search does not match any real products made for ${pet}, return an empty array [].
+3. Every brand name, product name, and size must be real and verifiable.
+4. The "stage" field must accurately reflect the real product (do NOT label an adult formula as Puppy or Kitten).
+5. Prices must be realistic for that product's actual market price. Rural King and Tractor Supply typically carry farm/value brands like 4Health, Retriever, and Sportmix and are usually slightly cheaper than pet specialty stores.
+6. Not every store carries every product. If a store does not realistically carry the product, still include it but note a typical online or in-store price estimate.
+
+Return a JSON array of up to 4 real matching products. Each product must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), and a prices array with store and price for every store in this list: ${STORES.join(", ")}.
+
+If no real products match the search for ${pet}, return: []
+
+Return ONLY valid JSON, no markdown, no explanation.
+
+Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Buffalo","type":"Dry","size":"30 lb","stage":"Adult","prices":[{"store":"PetSmart","price":62.99},{"store":"Petco","price":64.49},{"store":"Walmart","price":58.97},{"store":"Chewy","price":59.98},{"store":"Amazon","price":61.50},{"store":"Target","price":63.49},{"store":"Rural King","price":57.99},{"store":"Tractor Supply","price":58.49}]}]`
           }]
         })
       });
@@ -227,7 +244,7 @@ export default function App() {
               </div>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16,fontSize:12,color:"#666"}}>
                 <span style={{background:accentLight,color:accent,padding:"3px 10px",borderRadius:10,fontWeight:500}}>✨ AI-powered</span>
-                <span>Real brands, realistic prices across 6 major retailers</span>
+                <span>Real brands, realistic prices across 8 major retailers</span>
               </div>
               {error && <div style={{color:"#E24B4A",fontSize:14,marginBottom:12}}>{error}</div>}
               {loading && (
@@ -243,7 +260,14 @@ export default function App() {
                   <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult", "Purina Pro Plan kitten"</div>
                 </div>
               )}
-              {results && results.map((prod,i)=>{
+              {results && results.length === 0 && (
+                <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
+                  <div style={{fontSize:40,marginBottom:8}}>🔎</div>
+                  <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>No matching products found</div>
+                  <div style={{fontSize:13}}>Try a different search — make sure the brand makes food for {pet==="dogs"?"dogs":"cats"}!</div>
+                </div>
+              )}
+              {results && results.length > 0 && results.map((prod,i)=>{
                 const minP=getMin(prod.prices), maxP=getMax(prod.prices);
                 return (
                   <div key={i} onClick={()=>setSelectedProduct(prod)}
@@ -437,11 +461,8 @@ export default function App() {
           </div>
         </div>
       )}
-    </div>
 
-<Analytics />
+      <Analytics />
     </div>
-  );
-}
   );
 }
