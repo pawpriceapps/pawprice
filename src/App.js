@@ -479,6 +479,10 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
         </div>
       )}
 
+      <div style={{marginTop:24,padding:"12px 16px",background:"#f5f5f5",borderRadius:10,fontSize:11,color:"#999",textAlign:"center",lineHeight:1.5}}>
+        🐾 PawPrice earns a commission when you purchase through our links at no extra cost to you. Prices shown are estimates and may vary. Always verify pricing on the retailer's site.
+      </div>
+
       <Analytics />
     </div>
   );
