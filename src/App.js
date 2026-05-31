@@ -89,7 +89,6 @@ export default function App() {
   const [myUsername, setMyUsername] = useState("");
   const [sortDeals, setSortDeals] = useState("newest");
 
-  // My Pets state
   const [myPets, setMyPets] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pawprice_pets") || "[]"); } catch { return []; }
   });
@@ -102,6 +101,21 @@ export default function App() {
 
   const accent = pet === "dogs" ? "#EF9F27" : "#7F77DD";
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
+
+  function getStoreLink(store, productName) {
+    const q = encodeURIComponent(productName);
+    const links = {
+      "Amazon": `https://www.amazon.com/s?k=${q}&tag=pawprice-20`,
+      "Chewy": `https://www.chewy.com/s?query=${q}`,
+      "PetSmart": `https://www.petsmart.com/search/?q=${q}`,
+      "Petco": `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
+      "Walmart": `https://www.walmart.com/search?q=${q}`,
+      "Target": `https://www.target.com/s?searchTerm=${q}`,
+      "Rural King": `https://www.ruralking.com/catalogsearch/result/?q=${q}`,
+      "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${q}`,
+    };
+    return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
+  }
 
   function addPet() {
     if (!petForm.name.trim() || !petForm.food.trim()) return;
@@ -302,7 +316,10 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <span style={{fontSize:16,fontWeight:500,color:i===0?accent:"#333"}}>${p.price.toFixed(2)}</span>
-                      <a href={`https://www.amazon.com/s?k=${encodeURIComponent(selectedProduct.name)}&tag=pawprice-20`} target="_blank" rel="noopener noreferrer" style={{fontSize:12,color:accent,textDecoration:"none",border:`1px solid ${accent}`,borderRadius:6,padding:"4px 10px"}}>Buy on Amazon →</a>
+                      <a href={getStoreLink(p.store, selectedProduct.name)} target="_blank" rel="noopener noreferrer"
+                        style={{fontSize:12,color:accent,textDecoration:"none",border:`1px solid ${accent}`,borderRadius:6,padding:"4px 10px"}}>
+                        Buy at {p.store} →
+                      </a>
                     </div>
                   </div>
                 ))}
