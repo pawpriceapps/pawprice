@@ -225,7 +225,13 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
       </div>
 
       <div style={{display:"flex",gap:4,marginBottom:20,background:"#f5f5f5",padding:4,borderRadius:24,flexWrap:"wrap"}}>
-        {[["search","Search Prices"],["mypets","My Pets"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
+        {[
+          ["search","Search Prices"],
+          ["mypets","My Pets"],
+          ["ingredients","Ingredients"],
+          ["deals","Community Deals"],
+          ["leaderboard","Leaderboard"]
+        ].map(([t,l])=>(
           <button key={t} style={tabStyle(t)} onClick={()=>setTab(t)}>{l}</button>
         ))}
       </div>
@@ -391,6 +397,10 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
             ))
           )}
         </div>
+      )}
+
+      {tab==="ingredients" && (
+        <DogFoodIngredients />
       )}
 
       {tab==="deals" && (
