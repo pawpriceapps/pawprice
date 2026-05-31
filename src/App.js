@@ -1,7 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import { useState, useEffect } from "react";
 
-// ── Ingredient Checker helpers ──────────────────────────────────────────────
 const OPFF = "https://world.openpetfoodfacts.org";
 
 const qualityFlags = (ingredients = "") => {
@@ -17,9 +16,9 @@ const IngredientBadge = ({ word, index }) => {
   const isBad  = ["by-product","corn syrup","artificial","bha","bht","propylene","menadione","dye","red 40","yellow 5"].some(b => lower.includes(b));
   const isFirst = index === 0;
   let bg = "#f5f5f5", border = "#e0e0e0", color = "#555";
-  if (isFirst)      { bg = "#FFF8E1"; border = "#FFD54F"; color = "#F57F17"; }
-  else if (isGood)  { bg = "#E8F5E9"; border = "#81C784"; color = "#2E7D32"; }
-  else if (isBad)   { bg = "#FFEBEE"; border = "#EF9A9A"; color = "#C62828"; }
+  if (isFirst)     { bg = "#FFF8E1"; border = "#FFD54F"; color = "#F57F17"; }
+  else if (isGood) { bg = "#E8F5E9"; border = "#81C784"; color = "#2E7D32"; }
+  else if (isBad)  { bg = "#FFEBEE"; border = "#EF9A9A"; color = "#C62828"; }
   return (
     <span style={{ display:"inline-block", margin:"3px 4px", padding:"4px 10px",
       background:bg, border:`1px solid ${border}`, borderRadius:20,
@@ -30,7 +29,6 @@ const IngredientBadge = ({ word, index }) => {
   );
 };
 
-// ── Dog / Cat SVGs ──────────────────────────────────────────────────────────
 const DOG_SVG = (
   <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="60" cy="72" rx="32" ry="28" fill="#EF9F27"/>
@@ -79,21 +77,20 @@ const CAT_SVG = (
   </svg>
 );
 
-// ── Constants ───────────────────────────────────────────────────────────────
 const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Rural King","Tractor Supply"];
 
 const BADGES = [
-  { min:0,  max:0,   label:"Pup",            icon:"🐶" },
-  { min:1,  max:4,   label:"Bone Collector",  icon:"🦴" },
-  { min:5,  max:14,  label:"Pack Leader",     icon:"🐾" },
-  { min:15, max:999, label:"Top Sniffer",     icon:"🥇" },
+  { min:0,  max:0,   label:"Pup",           icon:"🐶" },
+  { min:1,  max:4,   label:"Bone Collector", icon:"🦴" },
+  { min:5,  max:14,  label:"Pack Leader",    icon:"🐾" },
+  { min:15, max:999, label:"Top Sniffer",    icon:"🥇" },
 ];
 function getBadge(count) { return BADGES.find(b => count >= b.min && count <= b.max) || BADGES[0]; }
 
 const INIT_DEALS = [
-  { id:1, user:"PawHunterMike",  pet:"dogs", store:"Walmart",        product:"Purina Pro Plan 35lb",       price:"$62.00", location:"Denver, CO",   upvotes:14, ts:Date.now()-3600000  },
-  { id:2, user:"CatLadyJess",    pet:"cats", store:"Petco",          product:"Blue Buffalo 12lb",          price:"$27.50", location:"Austin, TX",    upvotes:9,  ts:Date.now()-7200000  },
-  { id:3, user:"BudgetPawrent",  pet:"dogs", store:"Tractor Supply", product:"Hill's Science Diet 15lb",  price:"$39.99", location:"Chicago, IL",   upvotes:5,  ts:Date.now()-86400000 },
+  { id:1, user:"PawHunterMike",  pet:"dogs", store:"Walmart",        product:"Purina Pro Plan 35lb",      price:"$62.00", location:"Denver, CO",  upvotes:14, ts:Date.now()-3600000  },
+  { id:2, user:"CatLadyJess",    pet:"cats", store:"Petco",          product:"Blue Buffalo 12lb",         price:"$27.50", location:"Austin, TX",   upvotes:9,  ts:Date.now()-7200000  },
+  { id:3, user:"BudgetPawrent",  pet:"dogs", store:"Tractor Supply", product:"Hill's Science Diet 15lb", price:"$39.99", location:"Chicago, IL",  upvotes:5,  ts:Date.now()-86400000 },
 ];
 const INIT_USERS = {
   PawHunterMike: { deals:3, upvotes:28 },
@@ -101,18 +98,34 @@ const INIT_USERS = {
   BudgetPawrent: { deals:1, upvotes:5  },
 };
 
-// ── Main App ─────────────────────────────────────────────────────────────────
-export default function App() {
-  // Search tab state
-  const [tab, setTab]                     = useState("search");
-  const [pet, setPet]                     = useState("dogs");
-  const [search, setSearch]               = useState("");
-  const [results, setResults]             = useState(null);
-  const [loading, setLoading]             = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [error, setError]                 = useState("");
+// Fetch ingredients from Open Pet Food Facts
+async function fetchIngredients(productName) {
+  try {
+    const res  = await fetch(
+      `${OPFF}/cgi/search.pl?search_terms=${encodeURIComponent(productName)}&tagtype_0=categories&tag_contains_0=contains&tag_0=dog-food&fields=code,product_name,ingredients_text&search_simple=1&action=process&json=1&page_size=5`
+    );
+    const data = await res.json();
+    const match = (data.products || []).find(p => p.ingredients_text);
+    if (match) return match.ingredients_text;
+    return null;
+  } catch {
+    return null;
+  }
+}
 
-  // Deals / leaderboard state
+export default function App() {
+  const [tab, setTab]                         = useState("search");
+  const [pet, setPet]                         = useState("dogs");
+  const [search, setSearch]                   = useState("");
+  const [results, setResults]                 = useState(null);
+  const [loading, setLoading]                 = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [error, setError]                     = useState("");
+
+  // Ingredient state tied to selected product
+  const [ingText, setIngText]       = useState(null);   // string | null | "unavailable"
+  const [ingLoading, setIngLoading] = useState(false);
+
   const [deals, setDeals]                 = useState(INIT_DEALS);
   const [users, setUsers]                 = useState(INIT_USERS);
   const [upvoted, setUpvoted]             = useState({});
@@ -121,29 +134,30 @@ export default function App() {
   const [myUsername, setMyUsername]       = useState("");
   const [sortDeals, setSortDeals]         = useState("newest");
 
-  // My Pets state
   const [myPets, setMyPets] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pawprice_pets") || "[]"); } catch { return []; }
   });
   const [petForm, setPetForm] = useState({ name:"", type:"dogs", food:"" });
   const [petSaved, setPetSaved] = useState(false);
 
-  // Ingredient checker state
-  const [ingQuery, setIngQuery]           = useState("");
-  const [ingResults, setIngResults]       = useState([]);
-  const [ingSelected, setIngSelected]     = useState(null);
-  const [ingLoading, setIngLoading]       = useState(false);
-  const [ingDetailLoading, setIngDetailLoading] = useState(false);
-  const [ingError, setIngError]           = useState("");
-
   useEffect(() => {
     localStorage.setItem("pawprice_pets", JSON.stringify(myPets));
   }, [myPets]);
 
+  // Auto-fetch ingredients when a product is selected
+  useEffect(() => {
+    if (!selectedProduct) { setIngText(null); return; }
+    setIngLoading(true);
+    setIngText(null);
+    fetchIngredients(selectedProduct.name).then(result => {
+      setIngText(result || "unavailable");
+      setIngLoading(false);
+    });
+  }, [selectedProduct]);
+
   const accent      = pet === "dogs" ? "#EF9F27" : "#7F77DD";
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
 
-  // ── Store links ────────────────────────────────────────────────────────────
   function getStoreLink(store, productName) {
     const q = encodeURIComponent(productName);
     const links = {
@@ -159,7 +173,6 @@ export default function App() {
     return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
   }
 
-  // ── My Pets ────────────────────────────────────────────────────────────────
   function addPet() {
     if (!petForm.name.trim() || !petForm.food.trim()) return;
     setMyPets(prev => [...prev, { id:Date.now(), ...petForm }]);
@@ -173,7 +186,6 @@ export default function App() {
     setResults(null); setSelectedProduct(null); setError("");
   }
 
-  // ── Price search ───────────────────────────────────────────────────────────
   async function searchProducts() {
     if (!search.trim()) return;
     setLoading(true); setResults(null); setSelectedProduct(null); setError("");
@@ -215,7 +227,6 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
   function getMin(prices) { return Math.min(...prices.map(p=>p.price)); }
   function getMax(prices) { return Math.max(...prices.map(p=>p.price)); }
 
-  // ── Deals ──────────────────────────────────────────────────────────────────
   function submitDeal() {
     if (!dealForm.user||!dealForm.store||!dealForm.product||!dealForm.price||!dealForm.location) return;
     const newDeal = { id:Date.now(), ...dealForm, upvotes:0, ts:Date.now() };
@@ -233,50 +244,25 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
     setUpvoted(prev=>({...prev,[id]:true}));
   }
 
-  // ── Ingredient search ──────────────────────────────────────────────────────
-  async function searchIngredients() {
-    if (!ingQuery.trim()) return;
-    setIngLoading(true); setIngError(""); setIngResults([]); setIngSelected(null);
-    try {
-      const res  = await fetch(`${OPFF}/cgi/search.pl?search_terms=${encodeURIComponent(ingQuery)}&tagtype_0=categories&tag_contains_0=contains&tag_0=dog-food&fields=code,product_name,brands,image_small_url,ingredients_text&search_simple=1&action=process&json=1&page_size=8`);
-      const data = await res.json();
-      const valid = (data.products || []).filter(p => p.product_name);
-      setIngResults(valid);
-      if (valid.length === 0) setIngError("No products found. Try a different search term.");
-    } catch { setIngError("Failed to reach Open Pet Food Facts. Please try again."); }
-    setIngLoading(false);
-  }
+  const sortedDeals = [...deals].sort((a,b)=>sortDeals==="newest"?b.ts-a.ts:b.upvotes-a.upvotes);
+  const leaderboard = Object.entries(users).map(([name,data])=>({name,...data,score:data.deals*3+data.upvotes})).sort((a,b)=>b.score-a.score);
 
-  async function selectIngProduct(product) {
-    if (product.ingredients_text) { setIngSelected(product); return; }
-    setIngDetailLoading(true);
-    try {
-      const res  = await fetch(`${OPFF}/api/v2/product/${product.code}?fields=product_name,brands,ingredients_text,image_url,quantity`);
-      const data = await res.json();
-      setIngSelected({ ...product, ...data.product });
-    } catch { setIngSelected(product); }
-    setIngDetailLoading(false);
-  }
-
-  const ingredientList = ingSelected?.ingredients_text
-    ? ingSelected.ingredients_text.split(/,(?![^()]*\))/).map(s=>s.trim()).filter(Boolean)
-    : [];
-  const { good, bad } = qualityFlags(ingSelected?.ingredients_text);
-  const score      = Math.min(100, Math.max(0, 50 + good.length*12 - bad.length*18));
-  const scoreColor = score >= 70 ? "#2E7D32" : score >= 45 ? "#F57F17" : "#C62828";
-  const scoreBg    = score >= 70 ? "#E8F5E9" : score >= 45 ? "#FFF8E1" : "#FFEBEE";
-  const scoreLabel = score >= 70 ? "Good" : score >= 45 ? "Fair" : "Poor";
-
-  // ── Derived ────────────────────────────────────────────────────────────────
-  const sortedDeals  = [...deals].sort((a,b)=>sortDeals==="newest"?b.ts-a.ts:b.upvotes-a.upvotes);
-  const leaderboard  = Object.entries(users).map(([name,data])=>({name,...data,score:data.deals*3+data.upvotes})).sort((a,b)=>b.score-a.score);
   const tabStyle = (t) => ({
     padding:"8px 14px", borderRadius:20, border:"none", cursor:"pointer", fontWeight:500, fontSize:13,
     background: tab===t ? accent : "transparent",
     color: tab===t ? "white" : "#666", transition:"all 0.2s",
   });
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // Ingredient display vars
+  const ingredientList = ingText && ingText !== "unavailable"
+    ? ingText.split(/,(?![^()]*\))/).map(s=>s.trim()).filter(Boolean)
+    : [];
+  const { good, bad } = qualityFlags(ingText || "");
+  const score      = Math.min(100, Math.max(0, 50 + good.length*12 - bad.length*18));
+  const scoreColor = score >= 70 ? "#2E7D32" : score >= 45 ? "#F57F17" : "#C62828";
+  const scoreBg    = score >= 70 ? "#E8F5E9" : score >= 45 ? "#FFF8E1" : "#FFEBEE";
+  const scoreLabel = score >= 70 ? "Good" : score >= 45 ? "Fair" : "Poor";
+
   return (
     <div style={{fontFamily:"sans-serif",maxWidth:720,margin:"0 auto",padding:"1rem 1rem 2rem"}}>
 
@@ -291,7 +277,7 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
 
       {/* Tabs */}
       <div style={{display:"flex",gap:4,marginBottom:20,background:"#f5f5f5",padding:4,borderRadius:24,flexWrap:"wrap"}}>
-        {[["search","Search Prices"],["mypets","My Pets"],["ingredients","Ingredients"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
+        {[["search","Search Prices"],["mypets","My Pets"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
           <button key={t} style={tabStyle(t)} onClick={()=>setTab(t)}>{l}</button>
         ))}
       </div>
@@ -311,6 +297,7 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
               ))}
             </div>
           </div>
+
           {!selectedProduct ? (
             <>
               <div style={{display:"flex",gap:8,marginBottom:12}}>
@@ -372,7 +359,9 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                 style={{background:"transparent",border:"none",color:accent,cursor:"pointer",fontSize:14,fontWeight:500,marginBottom:14,padding:0}}>
                 ← Back to results
               </button>
-              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px"}}>
+
+              {/* Price comparison card */}
+              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px",marginBottom:16}}>
                 <div style={{fontWeight:500,fontSize:17,marginBottom:2}}>{selectedProduct.name}</div>
                 <div style={{fontSize:13,color:"#666",marginBottom:16}}>{selectedProduct.brand} · {selectedProduct.type} · {selectedProduct.size} · {selectedProduct.stage}</div>
                 {[...selectedProduct.prices].sort((a,b)=>a.price-b.price).map((p,i)=>(
@@ -393,6 +382,59 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                 <div style={{marginTop:14,padding:"10px 14px",background:accentLight,borderRadius:8,fontSize:13,color:"#666"}}>
                   💡 You save <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
                 </div>
+              </div>
+
+              {/* Ingredients section */}
+              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px"}}>
+                <div style={{fontWeight:500,fontSize:16,marginBottom:12}}>🧪 Ingredients</div>
+
+                {ingLoading && (
+                  <div style={{textAlign:"center",padding:"20px 0",color:"#999",fontSize:14}}>
+                    Looking up ingredients…
+                  </div>
+                )}
+
+                {!ingLoading && ingText === "unavailable" && (
+                  <div style={{textAlign:"center",padding:"16px 0",color:"#999"}}>
+                    <div style={{fontSize:28,marginBottom:8}}>😔</div>
+                    <div style={{fontSize:14,fontWeight:500,color:"#666"}}>We're sorry, the ingredients list is not available for this product.</div>
+                    <div style={{fontSize:12,marginTop:6,color:"#aaa"}}>Data powered by Open Pet Food Facts</div>
+                  </div>
+                )}
+
+                {!ingLoading && ingredientList.length>0 && (
+                  <>
+                    {/* Quality score */}
+                    <div style={{display:"flex",alignItems:"center",gap:14,padding:"12px 14px",background:scoreBg,borderRadius:10,marginBottom:16,border:`1px solid ${scoreColor}44`}}>
+                      <div style={{width:48,height:48,borderRadius:"50%",border:`3px solid ${scoreColor}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                        <span style={{fontSize:15,fontWeight:700,color:scoreColor}}>{score}</span>
+                      </div>
+                      <div>
+                        <div style={{fontWeight:600,color:scoreColor,fontSize:15}}>{scoreLabel} Quality</div>
+                        <div style={{fontSize:12,color:"#666",marginTop:2}}>
+                          {good.length>0 && `✓ Contains ${good.slice(0,2).join(", ")}. `}
+                          {bad.length>0  && `⚠ Watch: ${bad.slice(0,2).join(", ")}.`}
+                          {good.length===0&&bad.length===0&&"Review ingredients below."}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Legend */}
+                    <div style={{display:"flex",gap:12,marginBottom:12,flexWrap:"wrap"}}>
+                      {[["#F57F17","★ First ingredient"],["#2E7D32","Quality protein/veggie"],["#C62828","Watch out for"]].map(([c,l])=>(
+                        <span key={l} style={{fontSize:11,color:c,display:"flex",alignItems:"center",gap:4}}>
+                          <span style={{width:8,height:8,borderRadius:"50%",background:c,display:"inline-block"}}/>{l}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div style={{fontSize:12,color:"#999",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{ingredientList.length} Ingredients</div>
+                    <div style={{lineHeight:1.9}}>
+                      {ingredientList.map((ing,i)=><IngredientBadge key={i} word={ing} index={i}/>)}
+                    </div>
+                    <div style={{fontSize:11,color:"#bbb",marginTop:12}}>Data from Open Pet Food Facts · openpetfoodfacts.org</div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -454,130 +496,6 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* ── INGREDIENTS TAB ── */}
-      {tab==="ingredients" && (
-        <div>
-          <div style={{marginBottom:16}}>
-            <div style={{fontSize:18,fontWeight:600,marginBottom:4}}>🧪 Ingredient Checker</div>
-            <div style={{fontSize:13,color:"#666"}}>Search any dog food to see its full ingredient list and quality score.</div>
-          </div>
-
-          <div style={{display:"flex",gap:8,marginBottom:16}}>
-            <input value={ingQuery} onChange={e=>setIngQuery(e.target.value)}
-              onKeyDown={e=>e.key==="Enter"&&searchIngredients()}
-              placeholder="Search dog food (e.g. Blue Buffalo, Pedigree...)"
-              style={{flex:1,padding:"11px 16px",borderRadius:12,border:"1.5px solid #EF9F27",fontSize:14,outline:"none"}}/>
-            <button onClick={searchIngredients} disabled={ingLoading}
-              style={{padding:"11px 22px",borderRadius:12,background:"#EF9F27",color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,opacity:ingLoading?0.7:1}}>
-              {ingLoading?"…":"Search"}
-            </button>
-          </div>
-
-          {ingError && <div style={{color:"#E24B4A",fontSize:14,marginBottom:12}}>{ingError}</div>}
-
-          {ingResults.length>0 && !ingSelected && (
-            <div style={{marginBottom:16}}>
-              <div style={{fontSize:12,color:"#999",marginBottom:8}}>{ingResults.length} products found — tap one to see ingredients</div>
-              {ingResults.map(p=>(
-                <div key={p.code} onClick={()=>selectIngProduct(p)}
-                  style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"12px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
-                  {p.image_small_url
-                    ? <img src={p.image_small_url} alt="" style={{width:44,height:44,borderRadius:8,objectFit:"cover"}}/>
-                    : <div style={{width:44,height:44,borderRadius:8,background:"#f5f5f5",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>🐶</div>
-                  }
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:500,fontSize:14,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.product_name}</div>
-                    {p.brands && <div style={{fontSize:12,color:"#999",marginTop:2}}>{p.brands}</div>}
-                  </div>
-                  <span style={{fontSize:12,color:"#EF9F27"}}>View →</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {ingDetailLoading && (
-            <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
-              <div style={{fontSize:32,marginBottom:8}}>🔍</div>
-              <div>Loading ingredients…</div>
-            </div>
-          )}
-
-          {ingSelected && !ingDetailLoading && (
-            <div>
-              <button onClick={()=>setIngSelected(null)}
-                style={{background:"transparent",border:"none",color:"#EF9F27",cursor:"pointer",fontSize:14,fontWeight:500,marginBottom:14,padding:0}}>
-                ← Back to results
-              </button>
-              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px"}}>
-                <div style={{display:"flex",gap:14,alignItems:"flex-start",marginBottom:16}}>
-                  {ingSelected.image_url||ingSelected.image_small_url
-                    ? <img src={ingSelected.image_url||ingSelected.image_small_url} alt="" style={{width:64,height:64,borderRadius:10,objectFit:"cover"}}/>
-                    : <div style={{width:64,height:64,borderRadius:10,background:"#f5f5f5",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>🐶</div>
-                  }
-                  <div style={{flex:1}}>
-                    <div style={{fontWeight:600,fontSize:16}}>{ingSelected.product_name}</div>
-                    {ingSelected.brands   && <div style={{fontSize:13,color:"#666",marginTop:2}}>{ingSelected.brands}</div>}
-                    {ingSelected.quantity && <div style={{fontSize:12,color:"#999",marginTop:2}}>{ingSelected.quantity}</div>}
-                  </div>
-                </div>
-
-                {ingredientList.length>0 ? (
-                  <>
-                    {/* Quality score */}
-                    <div style={{display:"flex",alignItems:"center",gap:14,padding:"12px 14px",background:scoreBg,borderRadius:10,marginBottom:16,border:`1px solid ${scoreColor}44`}}>
-                      <div style={{width:48,height:48,borderRadius:"50%",border:`3px solid ${scoreColor}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                        <span style={{fontSize:15,fontWeight:700,color:scoreColor}}>{score}</span>
-                      </div>
-                      <div>
-                        <div style={{fontWeight:600,color:scoreColor,fontSize:15}}>{scoreLabel} Quality</div>
-                        <div style={{fontSize:12,color:"#666",marginTop:2}}>
-                          {good.length>0 && `✓ Contains ${good.slice(0,2).join(", ")}. `}
-                          {bad.length>0  && `⚠ Watch: ${bad.slice(0,2).join(", ")}.`}
-                          {good.length===0&&bad.length===0&&"Review ingredients below."}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Legend */}
-                    <div style={{display:"flex",gap:12,marginBottom:12,flexWrap:"wrap"}}>
-                      {[["#F57F17","#FFF8E1","★ First ingredient"],["#2E7D32","#E8F5E9","Quality protein/veggie"],["#C62828","#FFEBEE","Watch out for"]].map(([c,bg,l])=>(
-                        <span key={l} style={{fontSize:11,color:c,display:"flex",alignItems:"center",gap:4}}>
-                          <span style={{width:8,height:8,borderRadius:"50%",background:c,display:"inline-block"}}/>{l}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Badges */}
-                    <div style={{fontSize:12,color:"#999",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{ingredientList.length} Ingredients</div>
-                    <div style={{lineHeight:1.9}}>
-                      {ingredientList.map((ing,i)=><IngredientBadge key={i} word={ing} index={i}/>)}
-                    </div>
-                  </>
-                ) : (
-                  <div style={{textAlign:"center",padding:"2rem",color:"#999"}}>
-                    <div style={{fontSize:32,marginBottom:8}}>📋</div>
-                    <div style={{fontSize:14}}>No ingredient data available for this product yet.</div>
-                    <div style={{fontSize:12,marginTop:4}}>You can contribute at openpetfoodfacts.org</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {!ingLoading && ingResults.length===0 && !ingSelected && !ingError && (
-            <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
-              <div style={{fontSize:40,marginBottom:8}}>🔬</div>
-              <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>Check what's in your dog's food</div>
-              <div style={{fontSize:13}}>Try "Pedigree", "Purina", or "Royal Canin"</div>
-            </div>
-          )}
-
-          <div style={{marginTop:24,fontSize:11,color:"#bbb",textAlign:"center"}}>
-            Data from Open Pet Food Facts · openpetfoodfacts.org
-          </div>
         </div>
       )}
 
@@ -670,7 +588,6 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
         </div>
       )}
 
-      {/* Footer */}
       <div style={{marginTop:24,padding:"12px 16px",background:"#f5f5f5",borderRadius:10,fontSize:11,color:"#999",textAlign:"center",lineHeight:1.5}}>
         🐾 PawPrice earns a commission when you purchase through our links at no extra cost to you. Prices shown are estimates and may vary. Always verify pricing on the retailer's site.
       </div>
