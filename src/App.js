@@ -1,5 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import { useState, useEffect } from "react";
+import DogFoodIngredients from './components/DogFoodIngredients';
 
 const DOG_SVG = (
   <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
