@@ -27,6 +27,79 @@ const IngredientBadge = ({ word, index }) => {
   );
 };
 
+
+const DOG_SUGGESTIONS = [
+  "Blue Buffalo Life Protection Chicken & Brown Rice",
+  "Blue Buffalo Wilderness Chicken",
+  "Blue Buffalo Homestyle Recipe Chicken",
+  "Purina Pro Plan Chicken & Rice Adult",
+  "Purina Pro Plan Salmon & Rice Adult",
+  "Purina Pro Plan Puppy Chicken & Rice",
+  "Purina ONE SmartBlend Chicken & Rice",
+  "Purina ONE Natural Lamb & Rice",
+  "Purina Dog Chow Complete Adult",
+  "Purina Puppy Chow Complete Nutrition",
+  "Hill's Science Diet Adult Chicken & Barley",
+  "Hill's Science Diet Puppy Chicken Meal & Barley",
+  "Hill's Science Diet Senior 7+ Chicken",
+  "Royal Canin Adult Breed Health Nutrition",
+  "Royal Canin Medium Adult",
+  "Royal Canin Puppy",
+  "Pedigree Adult Complete Nutrition",
+  "Pedigree Puppy Complete Nutrition",
+  "Iams ProActive Health Adult MiniChunks",
+  "Iams ProActive Health Puppy",
+  "Eukanuba Adult Medium Breed",
+  "Eukanuba Puppy Medium Breed",
+  "Diamond Naturals Adult Lamb & Rice",
+  "Diamond Naturals Large Breed Adult",
+  "Diamond Naturals Puppy",
+  "Taste of the Wild High Prairie",
+  "Taste of the Wild Pacific Stream",
+  "Taste of the Wild Sierra Mountain",
+  "Merrick Grain Free Real Chicken",
+  "Merrick Classic Real Chicken & Sweet Potato",
+  "Wellness CORE Grain Free Original",
+  "Wellness Complete Health Adult Deboned Chicken",
+  "Nutro Natural Choice Adult Chicken & Brown Rice",
+  "Nutro Ultra Adult",
+  "Orijen Original",
+  "Orijen Puppy",
+  "Acana Grasslands",
+  "Acana Heritage Free-Run Poultry",
+  "Fromm Gold Adult",
+  "Fromm Four-Star Salmon & Chicken Pate",
+  "4Health Adult Chicken & Rice",
+  "4Health Puppy Chicken & Rice",
+  "Kirkland Signature Adult Chicken Rice & Vegetable",
+  "Kirkland Signature Puppy Chicken Rice & Vegetable",
+  "Victor Classic Hi-Pro Plus",
+  "Victor Select Beef Meal & Brown Rice",
+  "Sportmix Wholesome Chicken Meal & Rice",
+  "Retriever Adult Dog Food",
+  "Ol Roy Complete Nutrition",
+  "Natural Balance L.I.D. Sweet Potato & Fish",
+];
+
+const CAT_SUGGESTIONS = [
+  "Blue Buffalo Adult Chicken & Brown Rice",
+  "Blue Buffalo Wilderness Chicken Adult",
+  "Purina ONE Tender Selects Chicken",
+  "Purina Cat Chow Complete",
+  "Purina Pro Plan Adult Salmon & Rice",
+  "Hill's Science Diet Adult Indoor",
+  "Royal Canin Indoor Adult",
+  "Friskies Seafood Sensations",
+  "Fancy Feast Grilled Chicken",
+  "Meow Mix Original Choice",
+  "Iams ProActive Health Indoor Weight & Hairball",
+  "Wellness CORE Grain Free Indoor",
+  "Taste of the Wild Rocky Mountain",
+  "Natural Balance L.I.D. Green Pea & Salmon",
+  "Diamond Naturals Indoor Cat",
+];
+
+
 const DOG_SVG = (
   <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="60" cy="72" rx="32" ry="28" fill="#EF9F27"/>
@@ -100,6 +173,7 @@ export default function App() {
   const [tab, setTab]                         = useState("search");
   const [pet, setPet]                         = useState("dogs");
   const [search, setSearch]                   = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [results, setResults]                 = useState(null);
   const [loading, setLoading]                 = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -296,15 +370,37 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
 
           {!selectedProduct ? (
             <>
-              <div style={{display:"flex",gap:8,marginBottom:12}}>
-                <input value={search} onChange={e=>setSearch(e.target.value)}
-                  onKeyDown={e=>e.key==="Enter"&&searchProducts()}
-                  placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food…`}
-                  style={{flex:1,padding:"11px 16px",borderRadius:12,border:`1.5px solid ${accent}`,fontSize:14,outline:"none"}}/>
-                <button onClick={searchProducts} disabled={loading}
-                  style={{padding:"11px 22px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,opacity:loading?0.7:1}}>
-                  {loading?"…":"Search"}
-                </button>
+              <div style={{position:"relative",marginBottom:12}}>
+                <div style={{display:"flex",gap:8}}>
+                  <input value={search}
+                    onChange={e=>{setSearch(e.target.value);setShowSuggestions(true);}}
+                    onKeyDown={e=>{if(e.key==="Enter"){setShowSuggestions(false);searchProducts();}if(e.key==="Escape")setShowSuggestions(false);}}
+                    onFocus={()=>setShowSuggestions(true)}
+                    onBlur={()=>setTimeout(()=>setShowSuggestions(false),150)}
+                    placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food…`}
+                    style={{flex:1,padding:"11px 16px",borderRadius:12,border:`1.5px solid ${accent}`,fontSize:14,outline:"none"}}/>
+                  <button onClick={()=>{setShowSuggestions(false);searchProducts();}} disabled={loading}
+                    style={{padding:"11px 22px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,opacity:loading?0.7:1}}>
+                    {loading?"…":"Search"}
+                  </button>
+                </div>
+                {showSuggestions && search.trim().length > 0 && (() => {
+                  const list = pet==="dogs" ? DOG_SUGGESTIONS : CAT_SUGGESTIONS;
+                  const filtered = list.filter(s => s.toLowerCase().includes(search.toLowerCase())).slice(0,6);
+                  return filtered.length > 0 ? (
+                    <div style={{position:"absolute",top:"100%",left:0,right:0,background:"white",border:"1px solid #eee",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.1)",zIndex:100,overflow:"hidden",marginTop:4}}>
+                      {filtered.map((s,i)=>(
+                        <div key={i} onMouseDown={()=>{setSearch(s);setShowSuggestions(false);}}
+                          style={{padding:"10px 16px",cursor:"pointer",fontSize:14,borderBottom:i<filtered.length-1?"1px solid #f5f5f5":"none",display:"flex",alignItems:"center",gap:10}}
+                          onMouseEnter={e=>e.currentTarget.style.background="#f9f9f9"}
+                          onMouseLeave={e=>e.currentTarget.style.background="white"}>
+                          <span style={{color:accent,fontSize:16}}>🔍</span>
+                          <span>{s}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
               </div>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16,fontSize:12,color:"#666"}}>
                 <span style={{background:accentLight,color:accent,padding:"3px 10px",borderRadius:10,fontWeight:500}}>✨ AI-powered</span>
