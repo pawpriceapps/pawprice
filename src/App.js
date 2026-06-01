@@ -148,7 +148,7 @@ const CAT_SVG = (
   </svg>
 );
 
-const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Rural King","Tractor Supply"];
+const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Tractor Supply"];
 
 const BADGES = [
   { min:0,  max:0,   label:"Pup",           icon:"🐶" },
@@ -236,7 +236,7 @@ export default function App() {
       "Petco":          `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
       "Walmart":        `https://www.walmart.com/search?q=${q}`,
       "Target":         `https://www.target.com/s?searchTerm=${q}`,
-      "Rural King":     `https://www.google.com/search?q=${q}+Rural+King+dog+food&tbm=shop`,
+
       "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${q}`,
     };
     return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
