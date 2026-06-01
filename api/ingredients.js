@@ -27,8 +27,6 @@ export default async function handler(req, res) {
       }
     });
     const searchHtml = await searchRes.text();
-
-    // Extract first product URL from search results
     const productUrlMatch = searchHtml.match(/href="(\/[^"]+dp\/\d+[^"]*)"/);
     if (productUrlMatch) {
       const productUrl = `https://www.chewy.com${productUrlMatch[1].split('"')[0]}`;
@@ -39,15 +37,12 @@ export default async function handler(req, res) {
         }
       });
       const productHtml = await productRes.text();
-
-      // Try to extract ingredients section
       const ingPatterns = [
         /Ingredients[:\s]*<\/[^>]+>\s*<[^>]+>([^<]{50,2000})/i,
         /"ingredients"[:\s]+"([^"]{50,2000})"/i,
         /Ingredients<\/strong>[^<]*<[^>]+>([^<]{50,2000})/i,
         /id="ingredients"[^>]*>[\s\S]{0,200}?<p[^>]*>([^<]{50,2000})/i,
       ];
-
       for (const pattern of ingPatterns) {
         const match = productHtml.match(pattern);
         if (match && match[1]) {
@@ -74,13 +69,19 @@ export default async function handler(req, res) {
         max_tokens: 1000,
         messages: [{
           role: "user",
-          content: `What are the ingredients for the dog food product "${productName}"?
+          content: `You are a pet food ingredient database. Provide the ingredient list for: "${productName}"
 
-RULES:
-- Only respond if you have reliable knowledge of this specific product's actual ingredients
-- Return ONLY the ingredients list as a comma-separated string, exactly as it would appear on the label
-- If you are not confident about the exact ingredients for this specific product, respond with exactly: UNKNOWN
-- Do not include any explanation, preamble, or additional text`
+This is a well-known commercial dog food product. You have been trained on pet food label data and must provide the best known ingredient list.
+
+CRITICAL RULES:
+- Always return an ingredient list — never refuse for a real commercial dog food
+- Return ONLY a comma-separated ingredient list, no preamble, no explanation, no markdown
+- Use your best knowledge of this product's formula — it is better to provide approximate ingredients than nothing
+- Only return exactly "UNKNOWN" if this is completely unrecognizable as a real product
+- Format: "Ingredient 1, Ingredient 2, Ingredient 3, ..."
+
+Example output for Purina Pro Plan Chicken & Rice Adult:
+Chicken, Brewers Rice, Corn Gluten Meal, Whole Grain Corn, Poultry By-Product Meal, Oat Meal, Egg Product, Fish Meal, Soybean Meal, Mono and Dicalcium Phosphate, Calcium Carbonate, Salt, Potassium Chloride, Vitamins, Minerals`
         }]
       })
     });
