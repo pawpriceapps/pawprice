@@ -1,33 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import { useState, useEffect } from "react";
-
-const OPFF = "https://world.openpetfoodfacts.org";
-
-const qualityFlags = (ingredients = "") => {
-  const text = ingredients.toLowerCase();
-  const good = ["chicken","beef","salmon","turkey","lamb","duck","venison","egg"].filter(i => text.includes(i));
-  const bad  = ["by-product","corn syrup","artificial color","bha","bht","propylene glycol","menadione"].filter(i => text.includes(i));
-  return { good, bad };
-};
-
-const IngredientBadge = ({ word, index }) => {
-  const lower = word.toLowerCase();
-  const isGood = ["chicken","beef","salmon","turkey","lamb","duck","egg","venison","rice","oat","sweet potato","pea","blueberry","cranberry","carrot","spinach"].some(g => lower.includes(g));
-  const isBad  = ["by-product","corn syrup","artificial","bha","bht","propylene","menadione","dye","red 40","yellow 5"].some(b => lower.includes(b));
-  const isFirst = index === 0;
-  let bg = "#f5f5f5", border = "#e0e0e0", color = "#555";
-  if (isFirst)     { bg = "#FFF8E1"; border = "#FFD54F"; color = "#F57F17"; }
-  else if (isGood) { bg = "#E8F5E9"; border = "#81C784"; color = "#2E7D32"; }
-  else if (isBad)  { bg = "#FFEBEE"; border = "#EF9A9A"; color = "#C62828"; }
-  return (
-    <span style={{ display:"inline-block", margin:"3px 4px", padding:"4px 10px",
-      background:bg, border:`1px solid ${border}`, borderRadius:20,
-      color, fontSize:12, cursor:"default" }}>
-      {isFirst && <span style={{ marginRight:4 }}>★</span>}
-      {word.trim()}
-    </span>
-  );
-};
+import DogFoodIngredients from './components/DogFoodIngredients';
 
 const DOG_SVG = (
   <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
@@ -37,8 +10,10 @@ const DOG_SVG = (
     <ellipse cx="82" cy="34" rx="11" ry="16" fill="#BA7517" transform="rotate(15 82 34)"/>
     <ellipse cx="38" cy="36" rx="7" ry="11" fill="#FAC775" transform="rotate(-15 38 36)"/>
     <ellipse cx="82" cy="36" rx="7" ry="11" fill="#FAC775" transform="rotate(15 82 36)"/>
-    <circle cx="52" cy="50" r="5" fill="#2C2C2A"/><circle cx="68" cy="50" r="5" fill="#2C2C2A"/>
-    <circle cx="53" cy="49" r="2" fill="white"/><circle cx="69" cy="49" r="2" fill="white"/>
+    <circle cx="52" cy="50" r="5" fill="#2C2C2A"/>
+    <circle cx="68" cy="50" r="5" fill="#2C2C2A"/>
+    <circle cx="53" cy="49" r="2" fill="white"/>
+    <circle cx="69" cy="49" r="2" fill="white"/>
     <ellipse cx="60" cy="60" rx="9" ry="6" fill="#D85A30"/>
     <ellipse cx="60" cy="62" rx="6" ry="4" fill="#F0997B"/>
     <ellipse cx="40" cy="72" rx="8" ry="5" fill="#BA7517"/>
@@ -63,7 +38,8 @@ const CAT_SVG = (
     <ellipse cx="68" cy="50" rx="6" ry="7" fill="#1D9E75"/>
     <ellipse cx="52" cy="51" rx="3" ry="5" fill="#2C2C2A"/>
     <ellipse cx="68" cy="51" rx="3" ry="5" fill="#2C2C2A"/>
-    <circle cx="51" cy="49" r="1.5" fill="white"/><circle cx="67" cy="49" r="1.5" fill="white"/>
+    <circle cx="51" cy="49" r="1.5" fill="white"/>
+    <circle cx="67" cy="49" r="1.5" fill="white"/>
     <ellipse cx="60" cy="59" rx="5" ry="4" fill="#ED93B1"/>
     <path d="M55 63 Q60 67 65 63" stroke="#D4537E" strokeWidth="2" fill="none" strokeLinecap="round"/>
     <line x1="40" y1="57" x2="25" y2="53" stroke="#7F77DD" strokeWidth="1.5" strokeLinecap="round"/>
@@ -77,97 +53,66 @@ const CAT_SVG = (
   </svg>
 );
 
-const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Rural King","Tractor Supply"];
+const STORES = ["PetSmart", "Petco", "Walmart", "Chewy", "Amazon", "Target", "Rural King", "Tractor Supply"];
 
 const BADGES = [
-  { min:0,  max:0,   label:"Pup",           icon:"🐶" },
-  { min:1,  max:4,   label:"Bone Collector", icon:"🦴" },
-  { min:5,  max:14,  label:"Pack Leader",    icon:"🐾" },
-  { min:15, max:999, label:"Top Sniffer",    icon:"🥇" },
+  { min:0, max:0, label:"Pup", icon:"🐶" },
+  { min:1, max:4, label:"Bone Collector", icon:"🦴" },
+  { min:5, max:14, label:"Pack Leader", icon:"🐾" },
+  { min:15, max:999, label:"Top Sniffer", icon:"🥇" },
 ];
 function getBadge(count) { return BADGES.find(b => count >= b.min && count <= b.max) || BADGES[0]; }
 
 const INIT_DEALS = [
-  { id:1, user:"PawHunterMike",  pet:"dogs", store:"Walmart",        product:"Purina Pro Plan 35lb",      price:"$62.00", location:"Denver, CO",  upvotes:14, ts:Date.now()-3600000  },
-  { id:2, user:"CatLadyJess",    pet:"cats", store:"Petco",          product:"Blue Buffalo 12lb",         price:"$27.50", location:"Austin, TX",   upvotes:9,  ts:Date.now()-7200000  },
-  { id:3, user:"BudgetPawrent",  pet:"dogs", store:"Tractor Supply", product:"Hill's Science Diet 15lb", price:"$39.99", location:"Chicago, IL",  upvotes:5,  ts:Date.now()-86400000 },
+  { id:1, user:"PawHunterMike", pet:"dogs", store:"Walmart", product:"Purina Pro Plan 35lb", price:"$62.00", location:"Denver, CO", upvotes:14, ts: Date.now()-3600000 },
+  { id:2, user:"CatLadyJess", pet:"cats", store:"Petco", product:"Blue Buffalo 12lb", price:"$27.50", location:"Austin, TX", upvotes:9, ts: Date.now()-7200000 },
+  { id:3, user:"BudgetPawrent", pet:"dogs", store:"Tractor Supply", product:"Hill's Science Diet 15lb", price:"$39.99", location:"Chicago, IL", upvotes:5, ts: Date.now()-86400000 },
 ];
 const INIT_USERS = {
   PawHunterMike: { deals:3, upvotes:28 },
-  CatLadyJess:   { deals:2, upvotes:11 },
-  BudgetPawrent: { deals:1, upvotes:5  },
+  CatLadyJess: { deals:2, upvotes:11 },
+  BudgetPawrent: { deals:1, upvotes:5 },
 };
 
-// Fetch ingredients from Open Pet Food Facts
-async function fetchIngredients(productName) {
-  try {
-    const res  = await fetch(
-      `${OPFF}/cgi/search.pl?search_terms=${encodeURIComponent(productName)}&tagtype_0=categories&tag_contains_0=contains&tag_0=dog-food&fields=code,product_name,ingredients_text&search_simple=1&action=process&json=1&page_size=5`
-    );
-    const data = await res.json();
-    const match = (data.products || []).find(p => p.ingredients_text);
-    if (match) return match.ingredients_text;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 export default function App() {
-  const [tab, setTab]                         = useState("search");
-  const [pet, setPet]                         = useState("dogs");
-  const [search, setSearch]                   = useState("");
-  const [results, setResults]                 = useState(null);
-  const [loading, setLoading]                 = useState(false);
+  const [tab, setTab] = useState("search");
+  const [pet, setPet] = useState("dogs");
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [error, setError]                     = useState("");
-
-  // Ingredient state tied to selected product
-  const [ingText, setIngText]       = useState(null);   // string | null | "unavailable"
-  const [ingLoading, setIngLoading] = useState(false);
-
-  const [deals, setDeals]                 = useState(INIT_DEALS);
-  const [users, setUsers]                 = useState(INIT_USERS);
-  const [upvoted, setUpvoted]             = useState({});
-  const [dealForm, setDealForm]           = useState({ user:"", store:"", product:"", price:"", location:"", pet:"dogs" });
+  const [error, setError] = useState("");
+  const [deals, setDeals] = useState(INIT_DEALS);
+  const [users, setUsers] = useState(INIT_USERS);
+  const [upvoted, setUpvoted] = useState({});
+  const [dealForm, setDealForm] = useState({ user:"", store:"", product:"", price:"", location:"", pet:"dogs" });
   const [dealSubmitted, setDealSubmitted] = useState(false);
-  const [myUsername, setMyUsername]       = useState("");
-  const [sortDeals, setSortDeals]         = useState("newest");
+  const [myUsername, setMyUsername] = useState("");
+  const [sortDeals, setSortDeals] = useState("newest");
 
   const [myPets, setMyPets] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pawprice_pets") || "[]"); } catch { return []; }
   });
-  const [petForm, setPetForm] = useState({ name:"", type:"dogs", food:"" });
+  const [petForm, setPetForm] = useState({ name: "", type: "dogs", food: "" });
   const [petSaved, setPetSaved] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("pawprice_pets", JSON.stringify(myPets));
   }, [myPets]);
 
-  // Auto-fetch ingredients when a product is selected
-  useEffect(() => {
-    if (!selectedProduct) { setIngText(null); return; }
-    setIngLoading(true);
-    setIngText(null);
-    fetchIngredients(selectedProduct.name).then(result => {
-      setIngText(result || "unavailable");
-      setIngLoading(false);
-    });
-  }, [selectedProduct]);
-
-  const accent      = pet === "dogs" ? "#EF9F27" : "#7F77DD";
+  const accent = pet === "dogs" ? "#EF9F27" : "#7F77DD";
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
 
   function getStoreLink(store, productName) {
     const q = encodeURIComponent(productName);
     const links = {
-      "Amazon":         `https://www.amazon.com/s?k=${q}&tag=pawprice-20`,
-      "Chewy":          `https://www.chewy.com/s?query=${q}`,
-      "PetSmart":       `https://www.petsmart.com/search/?q=${q}`,
-      "Petco":          `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
-      "Walmart":        `https://www.walmart.com/search?q=${q}`,
-      "Target":         `https://www.target.com/s?searchTerm=${q}`,
-      "Rural King":     `https://www.ruralking.com/catalogsearch/result/?q=${q}`,
+      "Amazon": `https://www.amazon.com/s?k=${q}&tag=pawprice-20`,
+      "Chewy": `https://www.chewy.com/s?query=${q}`,
+      "PetSmart": `https://www.petsmart.com/search/?q=${q}`,
+      "Petco": `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
+      "Walmart": `https://www.walmart.com/search?q=${q}`,
+      "Target": `https://www.target.com/s?searchTerm=${q}`,
+      "Rural King": `https://www.ruralking.com/catalogsearch/result/?q=${q}`,
       "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${q}`,
     };
     return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
@@ -175,15 +120,24 @@ export default function App() {
 
   function addPet() {
     if (!petForm.name.trim() || !petForm.food.trim()) return;
-    setMyPets(prev => [...prev, { id:Date.now(), ...petForm }]);
-    setPetForm({ name:"", type:"dogs", food:"" });
+    const newPet = { id: Date.now(), ...petForm };
+    setMyPets(prev => [...prev, newPet]);
+    setPetForm({ name: "", type: "dogs", food: "" });
     setPetSaved(true);
     setTimeout(() => setPetSaved(false), 2000);
   }
-  function deletePet(id) { setMyPets(prev => prev.filter(p => p.id !== id)); }
+
+  function deletePet(id) {
+    setMyPets(prev => prev.filter(p => p.id !== id));
+  }
+
   function searchForPet(p) {
-    setPet(p.type); setSearch(p.food); setTab("search");
-    setResults(null); setSelectedProduct(null); setError("");
+    setPet(p.type);
+    setSearch(p.food);
+    setTab("search");
+    setResults(null);
+    setSelectedProduct(null);
+    setError("");
   }
 
   async function searchProducts() {
@@ -191,12 +145,14 @@ export default function App() {
     setLoading(true); setResults(null); setSelectedProduct(null); setError("");
     try {
       const response = await fetch("/api/search", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model:"claude-haiku-4-5-20251001",
-          max_tokens:1500,
-          messages:[{ role:"user", content:`You are a pet food price comparison assistant. The user is searching for "${search}" for their ${pet}.
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 1500,
+          messages: [{
+            role: "user",
+            content: `You are a pet food price comparison assistant. The user is searching for "${search}" for their ${pet}.
 
 STRICT RULES - follow exactly:
 1. Only return products that ACTUALLY EXIST and are made for ${pet}. Never invent or fabricate products.
@@ -212,15 +168,19 @@ If no real products match the search for ${pet}, return: []
 
 Return ONLY valid JSON, no markdown, no explanation.
 
-Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Buffalo","type":"Dry","size":"30 lb","stage":"Adult","prices":[{"store":"PetSmart","price":62.99},{"store":"Petco","price":64.49},{"store":"Walmart","price":58.97},{"store":"Chewy","price":59.98},{"store":"Amazon","price":61.50},{"store":"Target","price":63.49},{"store":"Rural King","price":57.99},{"store":"Tractor Supply","price":58.49}]}]` }]
+Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Buffalo","type":"Dry","size":"30 lb","stage":"Adult","prices":[{"store":"PetSmart","price":62.99},{"store":"Petco","price":64.49},{"store":"Walmart","price":58.97},{"store":"Chewy","price":59.98},{"store":"Amazon","price":61.50},{"store":"Target","price":63.49},{"store":"Rural King","price":57.99},{"store":"Tractor Supply","price":58.49}]}]`
+          }]
         })
       });
       const data = await response.json();
       if (!data.content) throw new Error(JSON.stringify(data));
-      const text  = data.content.map(c => c.text || "").join("");
+      const text = data.content.map(c => c.text || "").join("");
       const clean = text.replace(/```json|```/g,"").trim();
-      setResults(JSON.parse(clean));
-    } catch(e) { setError("Search failed: " + e.message); }
+      const parsed = JSON.parse(clean);
+      setResults(parsed);
+    } catch(e) {
+      setError("Search failed: " + e.message);
+    }
     setLoading(false);
   }
 
@@ -237,6 +197,7 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
     setDealSubmitted(true); setTimeout(()=>setDealSubmitted(false),3000);
     setTab("deals");
   }
+
   function upvoteDeal(id, dealUser) {
     if (upvoted[id]) return;
     setDeals(prev=>prev.map(d=>d.id===id?{...d,upvotes:d.upvotes+1}:d));
@@ -248,25 +209,13 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
   const leaderboard = Object.entries(users).map(([name,data])=>({name,...data,score:data.deals*3+data.upvotes})).sort((a,b)=>b.score-a.score);
 
   const tabStyle = (t) => ({
-    padding:"8px 14px", borderRadius:20, border:"none", cursor:"pointer", fontWeight:500, fontSize:13,
+    padding:"8px 14px", borderRadius:"20px", border:"none", cursor:"pointer", fontWeight:500, fontSize:13,
     background: tab===t ? accent : "transparent",
-    color: tab===t ? "white" : "#666", transition:"all 0.2s",
+    color: tab===t ? "white" : "#666", transition:"all 0.2s"
   });
-
-  // Ingredient display vars
-  const ingredientList = ingText && ingText !== "unavailable"
-    ? ingText.split(/,(?![^()]*\))/).map(s=>s.trim()).filter(Boolean)
-    : [];
-  const { good, bad } = qualityFlags(ingText || "");
-  const score      = Math.min(100, Math.max(0, 50 + good.length*12 - bad.length*18));
-  const scoreColor = score >= 70 ? "#2E7D32" : score >= 45 ? "#F57F17" : "#C62828";
-  const scoreBg    = score >= 70 ? "#E8F5E9" : score >= 45 ? "#FFF8E1" : "#FFEBEE";
-  const scoreLabel = score >= 70 ? "Good" : score >= 45 ? "Fair" : "Poor";
 
   return (
     <div style={{fontFamily:"sans-serif",maxWidth:720,margin:"0 auto",padding:"1rem 1rem 2rem"}}>
-
-      {/* Header */}
       <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
         <div style={{flexShrink:0}}>{pet==="dogs"?DOG_SVG:CAT_SVG}</div>
         <div style={{flex:1}}>
@@ -275,14 +224,18 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
         </div>
       </div>
 
-      {/* Tabs */}
       <div style={{display:"flex",gap:4,marginBottom:20,background:"#f5f5f5",padding:4,borderRadius:24,flexWrap:"wrap"}}>
-        {[["search","Search Prices"],["mypets","My Pets"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
+        {[
+          ["search","Search Prices"],
+          ["mypets","My Pets"],
+          ["ingredients","Ingredients"],
+          ["deals","Community Deals"],
+          ["leaderboard","Leaderboard"]
+        ].map(([t,l])=>(
           <button key={t} style={tabStyle(t)} onClick={()=>setTab(t)}>{l}</button>
         ))}
       </div>
 
-      {/* ── SEARCH TAB ── */}
       {tab==="search" && (
         <div>
           <div style={{display:"flex",gap:8,marginBottom:12}}>
@@ -328,14 +281,14 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                   <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult", "Purina Pro Plan kitten"</div>
                 </div>
               )}
-              {results && results.length===0 && (
+              {results && results.length === 0 && (
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:40,marginBottom:8}}>🔎</div>
                   <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>No matching products found</div>
                   <div style={{fontSize:13}}>Try a different search — make sure the brand makes food for {pet==="dogs"?"dogs":"cats"}!</div>
                 </div>
               )}
-              {results && results.length>0 && results.map((prod,i)=>{
+              {results && results.length > 0 && results.map((prod,i)=>{
                 const minP=getMin(prod.prices), maxP=getMax(prod.prices);
                 return (
                   <div key={i} onClick={()=>setSelectedProduct(prod)}
@@ -359,9 +312,7 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                 style={{background:"transparent",border:"none",color:accent,cursor:"pointer",fontSize:14,fontWeight:500,marginBottom:14,padding:0}}>
                 ← Back to results
               </button>
-
-              {/* Price comparison card */}
-              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px",marginBottom:16}}>
+              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px"}}>
                 <div style={{fontWeight:500,fontSize:17,marginBottom:2}}>{selectedProduct.name}</div>
                 <div style={{fontSize:13,color:"#666",marginBottom:16}}>{selectedProduct.brand} · {selectedProduct.type} · {selectedProduct.size} · {selectedProduct.stage}</div>
                 {[...selectedProduct.prices].sort((a,b)=>a.price-b.price).map((p,i)=>(
@@ -372,7 +323,7 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:12}}>
                       <span style={{fontSize:16,fontWeight:500,color:i===0?accent:"#333"}}>${p.price.toFixed(2)}</span>
-                      <a href={getStoreLink(p.store,selectedProduct.name)} target="_blank" rel="noopener noreferrer"
+                      <a href={getStoreLink(p.store, selectedProduct.name)} target="_blank" rel="noopener noreferrer"
                         style={{fontSize:12,color:accent,textDecoration:"none",border:`1px solid ${accent}`,borderRadius:6,padding:"4px 10px"}}>
                         Buy at {p.store} →
                       </a>
@@ -383,65 +334,11 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                   💡 You save <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
                 </div>
               </div>
-
-              {/* Ingredients section */}
-              <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px"}}>
-                <div style={{fontWeight:500,fontSize:16,marginBottom:12}}>🧪 Ingredients</div>
-
-                {ingLoading && (
-                  <div style={{textAlign:"center",padding:"20px 0",color:"#999",fontSize:14}}>
-                    Looking up ingredients…
-                  </div>
-                )}
-
-                {!ingLoading && ingText === "unavailable" && (
-                  <div style={{textAlign:"center",padding:"16px 0",color:"#999"}}>
-                    <div style={{fontSize:28,marginBottom:8}}>😔</div>
-                    <div style={{fontSize:14,fontWeight:500,color:"#666"}}>We're sorry, the ingredients list is not available for this product.</div>
-                    <div style={{fontSize:12,marginTop:6,color:"#aaa"}}>Data powered by Open Pet Food Facts</div>
-                  </div>
-                )}
-
-                {!ingLoading && ingredientList.length>0 && (
-                  <>
-                    {/* Quality score */}
-                    <div style={{display:"flex",alignItems:"center",gap:14,padding:"12px 14px",background:scoreBg,borderRadius:10,marginBottom:16,border:`1px solid ${scoreColor}44`}}>
-                      <div style={{width:48,height:48,borderRadius:"50%",border:`3px solid ${scoreColor}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                        <span style={{fontSize:15,fontWeight:700,color:scoreColor}}>{score}</span>
-                      </div>
-                      <div>
-                        <div style={{fontWeight:600,color:scoreColor,fontSize:15}}>{scoreLabel} Quality</div>
-                        <div style={{fontSize:12,color:"#666",marginTop:2}}>
-                          {good.length>0 && `✓ Contains ${good.slice(0,2).join(", ")}. `}
-                          {bad.length>0  && `⚠ Watch: ${bad.slice(0,2).join(", ")}.`}
-                          {good.length===0&&bad.length===0&&"Review ingredients below."}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Legend */}
-                    <div style={{display:"flex",gap:12,marginBottom:12,flexWrap:"wrap"}}>
-                      {[["#F57F17","★ First ingredient"],["#2E7D32","Quality protein/veggie"],["#C62828","Watch out for"]].map(([c,l])=>(
-                        <span key={l} style={{fontSize:11,color:c,display:"flex",alignItems:"center",gap:4}}>
-                          <span style={{width:8,height:8,borderRadius:"50%",background:c,display:"inline-block"}}/>{l}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div style={{fontSize:12,color:"#999",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{ingredientList.length} Ingredients</div>
-                    <div style={{lineHeight:1.9}}>
-                      {ingredientList.map((ing,i)=><IngredientBadge key={i} word={ing} index={i}/>)}
-                    </div>
-                    <div style={{fontSize:11,color:"#bbb",marginTop:12}}>Data from Open Pet Food Facts · openpetfoodfacts.org</div>
-                  </>
-                )}
-              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* ── MY PETS TAB ── */}
       {tab==="mypets" && (
         <div>
           <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"16px 18px",marginBottom:18}}>
@@ -465,41 +362,47 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                 style={{padding:"9px 12px",borderRadius:8,border:"1px solid #ddd",fontSize:14}}/>
               <button onClick={addPet}
                 style={{padding:"9px 22px",borderRadius:8,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,width:"fit-content"}}>
-                {petSaved?"Saved! ✓":"Save Pet"}
+                {petSaved ? "Saved! ✓" : "Save Pet"}
               </button>
             </div>
           </div>
-          {myPets.length===0 ? (
+
+          {myPets.length === 0 ? (
             <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
               <div style={{fontSize:40,marginBottom:8}}>🐾</div>
               <div style={{fontSize:15,fontWeight:500}}>No pets saved yet</div>
               <div style={{fontSize:13,marginTop:4}}>Add your first pet above!</div>
             </div>
-          ) : myPets.map(p=>(
-            <div key={p.id} style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                  <span style={{fontSize:20}}>{p.type==="dogs"?"🐶":"🐱"}</span>
-                  <span style={{fontWeight:500,fontSize:16}}>{p.name}</span>
+          ) : (
+            myPets.map(p=>(
+              <div key={p.id} style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                    <span style={{fontSize:20}}>{p.type==="dogs"?"🐶":"🐱"}</span>
+                    <span style={{fontWeight:500,fontSize:16}}>{p.name}</span>
+                  </div>
+                  <div style={{fontSize:13,color:"#666"}}>Favourite: {p.food}</div>
                 </div>
-                <div style={{fontSize:13,color:"#666"}}>Favourite: {p.food}</div>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>searchForPet(p)}
+                    style={{padding:"7px 14px",borderRadius:8,background:p.type==="dogs"?"#EF9F27":"#7F77DD",color:"white",border:"none",cursor:"pointer",fontSize:13,fontWeight:500}}>
+                    Search
+                  </button>
+                  <button onClick={()=>deletePet(p.id)}
+                    style={{padding:"7px 12px",borderRadius:8,background:"transparent",color:"#999",border:"1px solid #ddd",cursor:"pointer",fontSize:13}}>
+                    ✕
+                  </button>
+                </div>
               </div>
-              <div style={{display:"flex",gap:8}}>
-                <button onClick={()=>searchForPet(p)}
-                  style={{padding:"7px 14px",borderRadius:8,background:p.type==="dogs"?"#EF9F27":"#7F77DD",color:"white",border:"none",cursor:"pointer",fontSize:13,fontWeight:500}}>
-                  Search
-                </button>
-                <button onClick={()=>deletePet(p.id)}
-                  style={{padding:"7px 12px",borderRadius:8,background:"transparent",color:"#999",border:"1px solid #ddd",cursor:"pointer",fontSize:13}}>
-                  ✕
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
 
-      {/* ── DEALS TAB ── */}
+      {tab==="ingredients" && (
+        <DogFoodIngredients />
+      )}
+
       {tab==="deals" && (
         <div>
           <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"16px 18px",marginBottom:18}}>
@@ -555,7 +458,6 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
         </div>
       )}
 
-      {/* ── LEADERBOARD TAB ── */}
       {tab==="leaderboard" && (
         <div>
           <div style={{fontWeight:500,fontSize:16,marginBottom:4}}>Deal Finder Leaderboard</div>
