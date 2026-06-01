@@ -236,7 +236,7 @@ export default function App() {
       "Petco":          `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
       "Walmart":        `https://www.walmart.com/search?q=${q}`,
       "Target":         `https://www.target.com/s?searchTerm=${q}`,
-      "Rural King":     `https://www.ruralking.com/catalogsearch/result/?q=${q}`,
+      "Rural King":     `https://www.ruralking.com/search#q=${q}&t=All`,
       "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${q}`,
     };
     return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
