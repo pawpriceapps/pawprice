@@ -273,7 +273,9 @@ STRICT RULES - follow exactly:
 3. Every brand name, product name, and size must be real and verifiable.
 4. The "stage" field must accurately reflect the real product (do NOT label an adult formula as Puppy or Kitten).
 5. Prices must be realistic for that product's actual market price. Rural King and Tractor Supply typically carry farm/value brands like 4Health, Retriever, and Sportmix and are usually slightly cheaper than pet specialty stores.
-6. Not every store carries every product. If a store does not realistically carry the product, still include it but note a typical online or in-store price estimate.
+6. Not every store carries every product. If a store does not realistically carry the product, use your best estimate of a realistic price — but NEVER use 0 or null.
+7. CRITICAL: Every single price value must be a real positive number greater than 0. If you do not know the price for a store, estimate based on similar products. A price of 0 is never acceptable.
+8. If you are not confident enough to provide realistic prices for a product, do not include it in the results at all.
 
 Return a JSON array of up to 4 real matching products. Each product must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), and a prices array with store and price for every store in this list: ${STORES.join(", ")}.
 
@@ -288,7 +290,12 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
       if (!data.content) throw new Error(JSON.stringify(data));
       const text  = data.content.map(c => c.text || "").join("");
       const clean = text.replace(/```json|```/g,"").trim();
-      setResults(JSON.parse(clean));
+      const parsed = JSON.parse(clean);
+      // Filter out any products with zero prices
+      const valid = parsed.filter(p =>
+        p.prices && p.prices.length > 0 && p.prices.every(s => s.price > 0)
+      );
+      setResults(valid);
     } catch(e) { setError("Search failed: " + e.message); }
     setLoading(false);
   }
