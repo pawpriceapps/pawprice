@@ -148,7 +148,7 @@ const CAT_SVG = (
   </svg>
 );
 
-const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Tractor Supply"];
+const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Tractor Supply","Pet Supplies Plus"];
 
 const BADGES = [
   { min:0,  max:0,   label:"Pup",           icon:"🐶" },
@@ -412,7 +412,7 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
               </div>
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16,fontSize:12,color:"#666"}}>
                 <span style={{background:accentLight,color:accent,padding:"3px 10px",borderRadius:10,fontWeight:500}}>✨ AI-powered</span>
-                <span>Real brands, realistic prices across 8 major retailers</span>
+                <span>Real brands, estimated prices across 8 major retailers</span>
               </div>
               {error && <div style={{color:"#E24B4A",fontSize:14,marginBottom:12}}>{error}</div>}
               {loading && (
@@ -480,7 +480,10 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                   </div>
                 ))}
                 <div style={{marginTop:14,padding:"10px 14px",background:accentLight,borderRadius:8,fontSize:13,color:"#666"}}>
-                  💡 You save <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
+                  💡 Based on estimates, you could save up to <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
+                </div>
+                <div style={{marginTop:8,padding:"8px 12px",background:"#FFF8E1",border:"1px solid #FFD54F",borderRadius:8,fontSize:11,color:"#7a5800"}}>
+                  ⚠️ Prices shown are AI-generated estimates and may not reflect current retail prices. Always verify the actual price before purchasing.
                 </div>
               </div>
 
