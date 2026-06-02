@@ -227,18 +227,20 @@ export default function App() {
   const accent      = pet === "dogs" ? "#EF9F27" : "#7F77DD";
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
 
-  function getStoreLink(store, productName) {
-    const q = encodeURIComponent(productName);
+  function getStoreLink(store, productName, brandName) {
+    // Use brand name for better search results on retailer sites
+    const brand = encodeURIComponent(brandName || productName.split(' ').slice(0,2).join(' '));
+    const full  = encodeURIComponent(productName);
     const links = {
-      "Amazon":         `https://www.amazon.com/s?k=${q}&i=pet-supplies&tag=pawprice-20`,
-      "Chewy":          `https://www.chewy.com/s?query=${q}`,
-      "PetSmart":       `https://www.petsmart.com/search/?q=${q}`,
-      "Petco":          `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
-      "Walmart":        `https://www.walmart.com/search?q=${q}&typeahead=${q}`,
-      "Target":         `https://www.target.com/s?searchTerm=${q}&category=5xt89`,
-      "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${q}`,
+      "Amazon":         `https://www.amazon.com/s?k=${full}&i=pet-supplies&tag=pawprice-20`,
+      "Chewy":          `https://www.chewy.com/s?query=${full}`,
+      "PetSmart":       `https://www.petsmart.com/search/?q=${brand}+dog+food`,
+      "Petco":          `https://www.petco.com/shop/en/petcostore/search?q=${brand}+dog+food`,
+      "Walmart":        `https://www.walmart.com/search?q=${brand}+dog+food`,
+      "Target":         `https://www.target.com/s?searchTerm=${brand}+dog+food`,
+      "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${brand}+dog+food`,
     };
-    return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
+    return links[store] || `https://www.google.com/search?q=${full}+${encodeURIComponent(store)}`;
   }
 
   function addPet() {
