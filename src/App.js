@@ -230,13 +230,12 @@ export default function App() {
   function getStoreLink(store, productName) {
     const q = encodeURIComponent(productName);
     const links = {
-      "Amazon":         `https://www.amazon.com/s?k=${q}&tag=pawprice-20`,
+      "Amazon":         `https://www.amazon.com/s?k=${q}&i=pet-supplies&tag=pawprice-20`,
       "Chewy":          `https://www.chewy.com/s?query=${q}`,
       "PetSmart":       `https://www.petsmart.com/search/?q=${q}`,
       "Petco":          `https://www.petco.com/shop/en/petcostore/search?q=${q}`,
-      "Walmart":        `https://www.walmart.com/search?q=${q}`,
-      "Target":         `https://www.target.com/s?searchTerm=${q}`,
-
+      "Walmart":        `https://www.walmart.com/search?q=${q}&typeahead=${q}`,
+      "Target":         `https://www.target.com/s?searchTerm=${q}&category=5xt89`,
       "Tractor Supply": `https://www.tractorsupply.com/tsc/search/${q}`,
     };
     return links[store] || `https://www.google.com/search?q=${q}+${encodeURIComponent(store)}`;
