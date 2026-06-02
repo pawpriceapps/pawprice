@@ -169,20 +169,31 @@ const INIT_USERS = {
   BudgetPawrent: { deals:1, upvotes:5  },
 };
 
+// Health scoring based on product name keywords
+function getHealthScore(prod) {
+  const text = (prod.name + " " + prod.brand).toLowerCase();
+  const goodTerms = ["chicken","beef","salmon","turkey","lamb","duck","egg","venison","fish","herring","whitefish","bison","rabbit","pea","sweet potato","brown rice","oat","blueberry","cranberry","carrot","spinach","grain free","natural","real","deboned","wild","organic"];
+  const badTerms  = ["by-product","corn syrup","artificial","bha","bht","propylene","menadione","dye","red 40","yellow 5","meat meal","animal digest","added color","added sugar"];
+  const good = goodTerms.filter(i => text.includes(i)).length;
+  const bad  = badTerms.filter(i => text.includes(i)).length;
+  return good * 2 - bad * 3;
+}
+
 export default function App() {
   const [tab, setTab]                         = useState("search");
   const [pet, setPet]                         = useState("dogs");
   const [search, setSearch]                   = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [results, setResults]                 = useState(null);
+  const [sortResults, setSortResults]         = useState("default");
   const [loading, setLoading]                 = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [error, setError]                     = useState("");
 
-  const [ingText, setIngText]           = useState(null);
-  const [ingSource, setIngSource]       = useState(null);
+  const [ingText, setIngText]             = useState(null);
+  const [ingSource, setIngSource]         = useState(null);
   const [ingDisclaimer, setIngDisclaimer] = useState(false);
-  const [ingLoading, setIngLoading]     = useState(false);
+  const [ingLoading, setIngLoading]       = useState(false);
 
   const [deals, setDeals]                 = useState(INIT_DEALS);
   const [users, setUsers]                 = useState(INIT_USERS);
@@ -201,6 +212,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("pawprice_pets", JSON.stringify(myPets));
   }, [myPets]);
+
+  // Reset sort when new results come in
+  useEffect(() => {
+    setSortResults("default");
+  }, [results]);
 
   // Auto-fetch ingredients when product selected
   useEffect(() => {
@@ -228,7 +244,6 @@ export default function App() {
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
 
   function getStoreLink(store, productName, brandName) {
-    // Use brand name for better search results on retailer sites
     const brand = encodeURIComponent(brandName || productName.split(' ').slice(0,2).join(' '));
     const full  = encodeURIComponent(productName);
     const links = {
@@ -292,7 +307,6 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
       const text  = data.content.map(c => c.text || "").join("");
       const clean = text.replace(/```json|```/g,"").trim();
       const parsed = JSON.parse(clean);
-      // Filter out any products with zero prices
       const valid = parsed.filter(p =>
         p.prices && p.prices.length > 0 && p.prices.every(s => s.price > 0)
       );
@@ -303,6 +317,14 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
 
   function getMin(prices) { return Math.min(...prices.map(p=>p.price)); }
   function getMax(prices) { return Math.max(...prices.map(p=>p.price)); }
+
+  function getSortedResults() {
+    if (!results) return [];
+    const copy = [...results];
+    if (sortResults === "price")  return copy.sort((a,b) => getMin(a.prices) - getMin(b.prices));
+    if (sortResults === "health") return copy.sort((a,b) => getHealthScore(b) - getHealthScore(a));
+    return copy;
+  }
 
   function submitDeal() {
     if (!dealForm.user||!dealForm.store||!dealForm.product||!dealForm.price||!dealForm.location) return;
@@ -435,23 +457,82 @@ Example format: [{"name":"Blue Buffalo Life Protection Chicken","brand":"Blue Bu
                   <div style={{fontSize:13}}>Try a different search — make sure the brand makes food for {pet==="dogs"?"dogs":"cats"}!</div>
                 </div>
               )}
-              {results && results.length>0 && results.map((prod,i)=>{
-                const minP=getMin(prod.prices), maxP=getMax(prod.prices);
-                return (
-                  <div key={i} onClick={()=>setSelectedProduct(prod)}
-                    style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                    <div>
-                      <div style={{fontWeight:500,fontSize:15}}>{prod.name}</div>
-                      <div style={{fontSize:12,color:"#666",marginTop:3}}>{prod.brand} · {prod.type} · {prod.size} · {prod.stage}</div>
-                    </div>
-                    <div style={{textAlign:"right",flexShrink:0}}>
-                      <div style={{fontSize:18,fontWeight:500,color:accent}}>${minP.toFixed(2)}</div>
-                      <div style={{fontSize:11,color:"#666"}}>Save up to ${(maxP-minP).toFixed(2)}</div>
-                      <div style={{fontSize:11,color:accent,marginTop:2}}>Compare →</div>
-                    </div>
+
+              {/* ── Sort controls + sorted results ── */}
+              {results && results.length > 0 && (
+                <>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+                    <span style={{fontSize:13,color:"#666",fontWeight:500}}>Sort by:</span>
+                    {[
+                      { val:"default", label:"Relevance",       icon:"✦" },
+                      { val:"price",   label:"Lowest Price",     icon:"💰" },
+                      { val:"health",  label:"Healthiest First", icon:"🥦" },
+                    ].map(({ val, label, icon }) => (
+                      <button key={val} onClick={() => setSortResults(val)}
+                        style={{
+                          display:"flex", alignItems:"center", gap:5,
+                          padding:"6px 14px", borderRadius:20,
+                          border:`1.5px solid ${sortResults===val ? accent : "#ddd"}`,
+                          background: sortResults===val ? accentLight : "white",
+                          color: sortResults===val ? accent : "#666",
+                          cursor:"pointer", fontSize:12, fontWeight: sortResults===val ? 600 : 400,
+                          transition:"all 0.18s",
+                          boxShadow: sortResults===val ? `0 2px 8px ${accent}33` : "none",
+                        }}>
+                        <span>{icon}</span>
+                        <span>{label}</span>
+                        {sortResults===val && <span style={{fontSize:10}}>▼</span>}
+                      </button>
+                    ))}
                   </div>
-                );
-              })}
+
+                  {getSortedResults().map((prod, i) => {
+                    const minP = getMin(prod.prices);
+                    const maxP = getMax(prod.prices);
+                    const hs   = getHealthScore(prod);
+                    const healthBadge = hs >= 4
+                      ? { label:"Top Pick 🥦", bg:"#E8F5E9", color:"#2E7D32" }
+                      : hs >= 1
+                      ? { label:"Good Choice", bg:"#F1F8E9", color:"#558B2F" }
+                      : hs < 0
+                      ? { label:"Check Ingredients", bg:"#FFEBEE", color:"#C62828" }
+                      : null;
+
+                    return (
+                      <div key={i} onClick={() => setSelectedProduct(prod)}
+                        style={{
+                          background:"white", border:"1px solid #eee", borderRadius:12,
+                          padding:"14px 16px", cursor:"pointer", marginBottom:10,
+                          transition:"box-shadow 0.2s, border-color 0.2s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow="0 3px 14px rgba(0,0,0,0.09)"; e.currentTarget.style.borderColor=accent+"66"; }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow="none"; e.currentTarget.style.borderColor="#eee"; }}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontWeight:500,fontSize:15,marginBottom:2}}>{prod.name}</div>
+                            <div style={{fontSize:12,color:"#666",marginBottom:6}}>{prod.brand} · {prod.type} · {prod.size} · {prod.stage}</div>
+                            {sortResults==="health" && healthBadge && (
+                              <span style={{fontSize:11,padding:"2px 9px",borderRadius:8,background:healthBadge.bg,color:healthBadge.color,fontWeight:500}}>
+                                {healthBadge.label}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{textAlign:"right",flexShrink:0,marginLeft:12}}>
+                            <div style={{fontSize:18,fontWeight:500,color:accent}}>${minP.toFixed(2)}</div>
+                            <div style={{fontSize:11,color:"#999"}}>Save up to ${(maxP-minP).toFixed(2)}</div>
+                            <div style={{fontSize:11,color:accent,marginTop:2}}>Compare →</div>
+                          </div>
+                        </div>
+                        {sortResults==="price" && i===0 && (
+                          <div style={{marginTop:8,fontSize:11,padding:"3px 10px",background:accentLight,color:accent,borderRadius:8,display:"inline-block",fontWeight:600}}>
+                            💰 Lowest price in results
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
             </>
           ) : (
             <div>
