@@ -2,6 +2,7 @@
   "name": "PawPrice - Pet Food Price Comparison",
   "short_name": "PawPrice",
   "description": "AI-powered pet food price comparison across 8 major retailers",
+  "id": "app.pawprice.android",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,18 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
+      "src": "https://pawprice.app/logo192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "https://pawprice.app/logo512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
