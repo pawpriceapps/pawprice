@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.pawprice.twa",
+    "sha256_cert_fingerprints": ["C2:37:5E:8A:8F:8E:1E:87:D1:80:79:72:06:0D:73:52:19:26:53:6A:B9:93:09:83:12:A4:10:D0:C0:4E:33:B0"]
+  }
+}]
