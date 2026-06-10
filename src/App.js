@@ -1,4 +1,3 @@
-
 import { Analytics } from '@vercel/analytics/react';
 import { useState, useEffect } from "react";
 
@@ -215,6 +214,13 @@ export default function App() {
   const [petForm, setPetForm] = useState({ name:"", type:"dogs", food:"", dietaryNeeds:[] });
   const [petSaved, setPetSaved] = useState(false);
 
+  // ── Barcode Scanner state ──
+  const [showScanner, setShowScanner]         = useState(false);
+  const [scanResult, setScanResult]           = useState(null);
+  const [scanLoading, setScanLoading]         = useState(false);
+  const [scanError, setScanError]             = useState("");
+  const [cameraStream, setCameraStream]       = useState(null);
+
   // ── Price Alert state ──
   const [alerts, setAlerts]                   = useState(loadAlerts);
   const [triggeredAlerts, setTriggeredAlerts] = useState([]);
@@ -258,6 +264,124 @@ export default function App() {
     setActiveFilters(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   }
   function clearFilters() { setActiveFilters([]); }
+
+  // ── Barcode Scanner functions ──
+  async function openScanner() {
+    setScanResult(null); setScanError(""); setShowScanner(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      setCameraStream(stream);
+      setTimeout(() => {
+        const video = document.getElementById("pawprice-scanner-video");
+        if (video) { video.srcObject = stream; video.play(); }
+        startBarcodeDetection(stream);
+      }, 300);
+    } catch(e) {
+      setScanError("Camera access denied. Please allow camera access and try again.");
+    }
+  }
+
+  function closeScanner() {
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); setCameraStream(null); }
+    setShowScanner(false); setScanResult(null); setScanError("");
+  }
+
+  function startBarcodeDetection(stream) {
+    if (!("BarcodeDetector" in window)) {
+      setScanError("Barcode scanning not supported on this browser. Try Chrome on Android.");
+      return;
+    }
+    const detector = new window.BarcodeDetector({ formats: ["ean_13","ean_8","upc_a","upc_e"] });
+    const video = document.getElementById("pawprice-scanner-video");
+    if (!video) return;
+    const interval = setInterval(async () => {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        try {
+          const barcodes = await detector.detect(video);
+          if (barcodes.length > 0) {
+            clearInterval(interval);
+            const barcode = barcodes[0].rawValue;
+            lookupBarcode(barcode);
+          }
+        } catch(e) {}
+      }
+    }, 500);
+    // Auto-stop after 30 seconds
+    setTimeout(() => { clearInterval(interval); }, 30000);
+  }
+
+  async function lookupBarcode(barcode) {
+    setScanLoading(true); setScanError("");
+    try {
+      // Try Open Pet Food Facts API first
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const data = await res.json();
+      if (data.status === 1 && data.product) {
+        const p = data.product;
+        const productName = p.product_name || p.brands || "";
+        const brand = p.brands || "";
+        const ingredients = p.ingredients_text || "";
+        if (productName) {
+          await processScanResult(productName, brand, ingredients, barcode);
+          return;
+        }
+      }
+      // Fallback: ask AI to identify by barcode
+      await processScanResult("", "", "", barcode);
+    } catch(e) {
+      setScanError("Could not look up barcode. Try searching manually.");
+      setScanLoading(false);
+    }
+  }
+
+  async function processScanResult(productName, brand, ingredients, barcode) {
+    try {
+      const response = await fetch("/api/search", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model:"claude-haiku-4-5-20251001", max_tokens:1500,
+          messages:[{ role:"user", content:`You are a pet food analyzer. ${productName ? `The product is "${productName}" by "${brand}".` : `The barcode is ${barcode}.`}
+
+${ingredients ? `Known ingredients: ${ingredients}` : ""}
+
+Please analyze this pet food and return a JSON object with:
+- name: full product name
+- brand: brand name
+- type: Dry/Wet/Treats
+- size: typical size (e.g. "30 lb")
+- stage: Adult/Puppy/Kitten/Senior
+- healthScore: number 0-100 rating the nutritional quality
+- healthLabel: "Excellent" / "Good" / "Fair" / "Poor"
+- healthSummary: 1-2 sentence explanation of the health rating
+- positives: array of up to 3 good things about this food
+- concerns: array of up to 3 concerns or watch-outs
+- dietaryTags: array from: grain_free, limited_ingredient, high_protein, low_fat, no_chicken, no_beef, no_fish, no_grain_corn, no_dairy, organic, no_artificial
+- typicalPrice: estimated typical retail price as a number
+- cheaperOnline: true/false — is this product typically cheaper online than in pet stores?
+- onlineNote: if cheaperOnline is true, where is the best online price typically found
+
+Return ONLY valid JSON, no markdown.` }]
+        })
+      });
+      const data = await response.json();
+      const text = data.content.map(c => c.text || "").join("");
+      const clean = text.replace(/```json|```/g,"").trim();
+      const parsed = JSON.parse(clean);
+      setScanResult(parsed);
+      if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); setCameraStream(null); }
+    } catch(e) {
+      setScanError("Could not analyze product. Try searching manually.");
+    }
+    setScanLoading(false);
+  }
+
+  function useScanResult() {
+    if (!scanResult) return;
+    setSearch(scanResult.name);
+    setPet("dogs");
+    closeScanner();
+    setTimeout(() => searchProducts(), 100);
+  }
 
   // ── Alert functions ──
   function openAlertModal(prod) { setAlertProduct(prod); setAlertTargetPrice(""); setAlertSaved(false); setShowAlertModal(true); }
@@ -428,6 +552,129 @@ Return ONLY valid JSON, no markdown.` }]
   return (
     <div style={{fontFamily:"sans-serif",maxWidth:720,margin:"0 auto",padding:"1rem 1rem 2rem"}}>
 
+      {/* ── Barcode Scanner Modal ── */}
+      {showScanner && (
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.92)",zIndex:1000,display:"flex",flexDirection:"column"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 20px"}}>
+            <div style={{color:"white",fontWeight:500,fontSize:17}}>📷 Scan Pet Food Barcode</div>
+            <button onClick={closeScanner}
+              style={{background:"rgba(255,255,255,0.15)",border:"none",color:"white",cursor:"pointer",fontSize:16,padding:"8px 14px",borderRadius:8}}>
+              Close ✕
+            </button>
+          </div>
+
+          {!scanResult && !scanLoading && !scanError && (
+            <>
+              <div style={{flex:1,position:"relative",margin:"0 16px"}}>
+                <video id="pawprice-scanner-video" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:16}} playsInline muted/>
+                {/* Scan frame overlay */}
+                <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:240,height:160,border:"3px solid #EF9F27",borderRadius:12,boxShadow:"0 0 0 9999px rgba(0,0,0,0.5)"}}>
+                  <div style={{position:"absolute",top:-2,left:-2,width:24,height:24,borderTop:"4px solid #EF9F27",borderLeft:"4px solid #EF9F27",borderRadius:"4px 0 0 0"}}/>
+                  <div style={{position:"absolute",top:-2,right:-2,width:24,height:24,borderTop:"4px solid #EF9F27",borderRight:"4px solid #EF9F27",borderRadius:"0 4px 0 0"}}/>
+                  <div style={{position:"absolute",bottom:-2,left:-2,width:24,height:24,borderBottom:"4px solid #EF9F27",borderLeft:"4px solid #EF9F27",borderRadius:"0 0 0 4px"}}/>
+                  <div style={{position:"absolute",bottom:-2,right:-2,width:24,height:24,borderBottom:"4px solid #EF9F27",borderRight:"4px solid #EF9F27",borderRadius:"0 0 4px 0"}}/>
+                </div>
+              </div>
+              <div style={{color:"rgba(255,255,255,0.7)",fontSize:13,textAlign:"center",padding:"16px"}}>
+                Point camera at the barcode on any pet food package
+              </div>
+            </>
+          )}
+
+          {scanLoading && (
+            <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"white"}}>
+              <div style={{fontSize:48,marginBottom:16}}>🔍</div>
+              <div style={{fontSize:16,fontWeight:500}}>Analyzing product…</div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,0.6)",marginTop:8}}>Checking ingredients & prices</div>
+            </div>
+          )}
+
+          {scanError && (
+            <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"2rem"}}>
+              <div style={{fontSize:48,marginBottom:16}}>😔</div>
+              <div style={{color:"white",fontSize:15,fontWeight:500,marginBottom:8,textAlign:"center"}}>{scanError}</div>
+              <button onClick={closeScanner}
+                style={{marginTop:16,padding:"10px 24px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500}}>
+                Search Instead
+              </button>
+            </div>
+          )}
+
+          {scanResult && !scanLoading && (
+            <div style={{flex:1,overflow:"auto",padding:"0 16px 16px"}}>
+              {/* Health Score */}
+              <div style={{background:"white",borderRadius:16,padding:"20px",marginBottom:12}}>
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
+                  <div style={{
+                    width:64,height:64,borderRadius:"50%",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",
+                    border:`4px solid ${scanResult.healthScore>=70?"#2E7D32":scanResult.healthScore>=45?"#F57F17":"#C62828"}`,
+                    background:scanResult.healthScore>=70?"#E8F5E9":scanResult.healthScore>=45?"#FFF8E1":"#FFEBEE"
+                  }}>
+                    <span style={{fontSize:20,fontWeight:700,color:scanResult.healthScore>=70?"#2E7D32":scanResult.healthScore>=45?"#F57F17":"#C62828"}}>{scanResult.healthScore}</span>
+                  </div>
+                  <div>
+                    <div style={{fontWeight:500,fontSize:16}}>{scanResult.name}</div>
+                    <div style={{fontSize:13,color:"#666"}}>{scanResult.brand} · {scanResult.type} · {scanResult.stage}</div>
+                    <div style={{fontSize:13,fontWeight:600,marginTop:4,color:scanResult.healthScore>=70?"#2E7D32":scanResult.healthScore>=45?"#F57F17":"#C62828"}}>
+                      {scanResult.healthLabel} Quality
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{fontSize:13,color:"#444",marginBottom:12,lineHeight:1.5}}>{scanResult.healthSummary}</div>
+
+                {scanResult.positives?.length>0&&(
+                  <div style={{marginBottom:8}}>
+                    {scanResult.positives.map((p,i)=>(
+                      <div key={i} style={{fontSize:12,color:"#2E7D32",display:"flex",gap:6,marginBottom:3}}>
+                        <span>✓</span><span>{p}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {scanResult.concerns?.length>0&&(
+                  <div style={{marginBottom:12}}>
+                    {scanResult.concerns.map((c,i)=>(
+                      <div key={i} style={{fontSize:12,color:"#C62828",display:"flex",gap:6,marginBottom:3}}>
+                        <span>⚠</span><span>{c}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {scanResult.dietaryTags?.length>0&&(
+                  <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:12}}>
+                    {scanResult.dietaryTags.map(tagId=>{
+                      const tagDef=DIET_FILTERS.find(f=>f.id===tagId);
+                      if(!tagDef) return null;
+                      const isAllergen=tagId.startsWith("no_");
+                      return <span key={tagId} style={{fontSize:11,padding:"3px 10px",borderRadius:10,background:isAllergen?"#FFEBEE":"#E8F5E9",color:isAllergen?"#C62828":"#2E7D32",fontWeight:500}}>{tagDef.icon} {tagDef.label}</span>;
+                    })}
+                  </div>
+                )}
+
+                {scanResult.cheaperOnline&&(
+                  <div style={{padding:"10px 12px",background:"#E8F5E9",borderRadius:8,fontSize:12,color:"#2E7D32",marginBottom:12}}>
+                    💰 <strong>Cheaper online!</strong> {scanResult.onlineNote}
+                  </div>
+                )}
+
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={useScanResult}
+                    style={{flex:1,padding:"11px",borderRadius:10,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14}}>
+                    Compare Prices →
+                  </button>
+                  <button onClick={closeScanner}
+                    style={{padding:"11px 16px",borderRadius:10,background:"transparent",color:"#666",border:"1px solid #ddd",cursor:"pointer",fontSize:14}}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Price Alert Modal ── */}
       {showAlertModal && alertProduct && (
         <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
@@ -513,6 +760,11 @@ Return ONLY valid JSON, no markdown.` }]
                     onBlur={()=>setTimeout(()=>setShowSuggestions(false),150)}
                     placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food…`}
                     style={{flex:1,padding:"11px 16px",borderRadius:12,border:`1.5px solid ${accent}`,fontSize:14,outline:"none"}}/>
+                  <button onClick={openScanner}
+                    title="Scan barcode"
+                    style={{padding:"11px 14px",borderRadius:12,background:"white",color:accent,border:`1.5px solid ${accent}`,cursor:"pointer",fontSize:18,flexShrink:0}}>
+                    📷
+                  </button>
                   <button onClick={()=>{setShowSuggestions(false);searchProducts();}} disabled={loading}
                     style={{padding:"11px 22px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,opacity:loading?0.7:1}}>
                     {loading?"…":"Search"}
