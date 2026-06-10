@@ -339,7 +339,9 @@ STRICT RULES:
 5. Prices must be realistic. Never use 0 or null.
 6. Each product must include a "dietaryTags" array listing which apply: grain_free, limited_ingredient, hypoallergenic, high_protein, low_fat, low_sodium, weight_management, senior, puppy_kitten, no_chicken, no_beef, no_fish, no_grain_corn, no_dairy, organic, no_artificial.
 
-Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), and prices array with store and price for: ${STORES.join(", ")}.
+Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), typicalLow (number: the typical lowest price this product sells for historically), typicalHigh (number: the typical highest price), typicalAvg (number: the typical average price), and prices array with store and price for: ${STORES.join(", ")}.
+
+The typicalLow, typicalHigh, and typicalAvg fields should reflect realistic historical price ranges for that exact product based on your knowledge of typical retail pricing patterns. Be accurate — these are used to tell users if today's price is a good deal.
 
 If no real products match for ${pet}, return: []
 Return ONLY valid JSON, no markdown.` }]
@@ -358,6 +360,17 @@ Return ONLY valid JSON, no markdown.` }]
 
   function getMin(prices) { return Math.min(...prices.map(p=>p.price)); }
   function getMax(prices) { return Math.max(...prices.map(p=>p.price)); }
+
+  function getPriceTrend(prod) {
+    if (!prod.typicalLow || !prod.typicalHigh || !prod.typicalAvg) return null;
+    const current = getMin(prod.prices);
+    const { typicalLow, typicalHigh, typicalAvg } = prod;
+    const pct = (current - typicalAvg) / typicalAvg;
+    if (current <= typicalLow * 1.03) return { label:"Best price we've seen", icon:"🟢", color:"#2E7D32", bg:"#E8F5E9", detail:`Usually $${typicalAvg.toFixed(2)} avg — this is a great deal!` };
+    if (pct <= -0.08) return { label:"Below average price", icon:"🟢", color:"#2E7D32", bg:"#E8F5E9", detail:`Avg is $${typicalAvg.toFixed(2)} — good time to buy` };
+    if (pct <= 0.05)  return { label:"Average price", icon:"🟡", color:"#F57F17", bg:"#FFF8E1", detail:`Typical range $${typicalLow.toFixed(2)}–$${typicalHigh.toFixed(2)}` };
+    return { label:"Above average price", icon:"🔴", color:"#C62828", bg:"#FFEBEE", detail:`Avg is $${typicalAvg.toFixed(2)} — might want to wait` };
+  }
 
   function getSortedResults() {
     if (!results) return [];
@@ -664,10 +677,11 @@ Return ONLY valid JSON, no markdown.` }]
                     const hs=getHealthScore(prod);
                     const healthBadge=hs>=4?{label:"Top Pick 🥦",bg:"#E8F5E9",color:"#2E7D32"}:hs>=1?{label:"Good Choice",bg:"#F1F8E9",color:"#558B2F"}:hs<0?{label:"Check Ingredients",bg:"#FFEBEE",color:"#C62828"}:null;
                     const alreadyAlerted = hasAlert(prod.name);
+                    const trend = getPriceTrend(prod);
                     return (
-                      <div key={i} style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",marginBottom:10,transition:"box-shadow 0.2s,border-color 0.2s"}}
-                        onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 3px 14px rgba(0,0,0,0.09)";e.currentTarget.style.borderColor=accent+"66";}}
-                        onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor="#eee";}}>
+                      <div key={i} style={{background:"white",border:`1px solid ${trend&&trend.icon==="🟢"?"#81C784":"#eee"}`,borderRadius:12,padding:"14px 16px",marginBottom:10,transition:"box-shadow 0.2s,border-color 0.2s"}}
+                        onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 3px 14px rgba(0,0,0,0.09)";}}
+                        onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",cursor:"pointer"}} onClick={()=>setSelectedProduct(prod)}>
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{fontWeight:500,fontSize:15,marginBottom:2}}>{prod.name}</div>
@@ -693,6 +707,16 @@ Return ONLY valid JSON, no markdown.` }]
                             <div style={{fontSize:11,color:accent,marginTop:2}}>Compare →</div>
                           </div>
                         </div>
+                        {/* Price trend badge */}
+                        {trend && (
+                          <div style={{margin:"8px 0 4px",padding:"7px 12px",background:trend.bg,borderRadius:8,display:"flex",alignItems:"center",gap:6}}>
+                            <span style={{fontSize:13}}>{trend.icon}</span>
+                            <div>
+                              <span style={{fontSize:12,fontWeight:600,color:trend.color}}>{trend.label}</span>
+                              <span style={{fontSize:11,color:"#666",marginLeft:6}}>{trend.detail}</span>
+                            </div>
+                          </div>
+                        )}
                         {/* Set Alert button */}
                         <div style={{marginTop:10,paddingTop:10,borderTop:"1px solid #f5f5f5",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                           <button onClick={()=>openAlertModal(prod)}
@@ -759,6 +783,15 @@ Return ONLY valid JSON, no markdown.` }]
                 <div style={{marginTop:14,padding:"10px 14px",background:accentLight,borderRadius:8,fontSize:13,color:"#666"}}>
                   💡 You could save up to <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
                 </div>
+                {getPriceTrend(selectedProduct) && (() => { const t = getPriceTrend(selectedProduct); return (
+                  <div style={{marginTop:8,padding:"10px 14px",background:t.bg,borderRadius:8,display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:16}}>{t.icon}</span>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:600,color:t.color}}>{t.label}</div>
+                      <div style={{fontSize:12,color:"#666"}}>{t.detail}</div>
+                    </div>
+                  </div>
+                ); })()}
                 <div style={{marginTop:8,padding:"8px 12px",background:"#FFF8E1",border:"1px solid #FFD54F",borderRadius:8,fontSize:11,color:"#7a5800"}}>
                   ⚠️ Prices shown are AI-generated estimates. Always verify on the retailer's site before purchasing.
                 </div>
