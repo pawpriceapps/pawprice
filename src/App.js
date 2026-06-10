@@ -341,7 +341,7 @@ STRICT RULES:
 
 Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), typicalLow (number: the typical lowest price this product sells for historically), typicalHigh (number: the typical highest price), typicalAvg (number: the typical average price), and prices array with store and price for: ${STORES.join(", ")}.
 
-The typicalLow, typicalHigh, and typicalAvg fields should reflect realistic historical price ranges for that exact product based on your knowledge of typical retail pricing patterns. Be accurate — these are used to tell users if today's price is a good deal.
+REQUIRED: Every product MUST include typicalLow, typicalHigh, and typicalAvg as numbers. These represent the realistic historical price range for that product size based on your knowledge of typical US retail pricing. Never omit these fields. Example: a 30lb bag of Purina Pro Plan typically sells between $38-$48, so typicalLow=38, typicalHigh=48, typicalAvg=43.
 
 If no real products match for ${pet}, return: []
 Return ONLY valid JSON, no markdown.` }]
