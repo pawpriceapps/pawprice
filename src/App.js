@@ -362,11 +362,14 @@ Return ONLY valid JSON, no markdown.` }]
   function getMax(prices) { return Math.max(...prices.map(p=>p.price)); }
 
   function getPriceTrend(prod) {
-    if (!prod.typicalLow || !prod.typicalHigh || !prod.typicalAvg) return null;
     const current = getMin(prod.prices);
-    const { typicalLow, typicalHigh, typicalAvg } = prod;
+    const maxP = getMax(prod.prices);
+    // Use AI-provided typical prices if available, otherwise estimate from price spread
+    const typicalAvg  = prod.typicalAvg  || ((current + maxP) / 2);
+    const typicalLow  = prod.typicalLow  || (current * 0.95);
+    const typicalHigh = prod.typicalHigh || (maxP * 1.08);
     const pct = (current - typicalAvg) / typicalAvg;
-    if (current <= typicalLow * 1.03) return { label:"Best price we've seen", icon:"🟢", color:"#2E7D32", bg:"#E8F5E9", detail:`Usually $${typicalAvg.toFixed(2)} avg — this is a great deal!` };
+    if (current <= typicalLow * 1.03) return { label:"Best price we've seen", icon:"🟢", color:"#2E7D32", bg:"#E8F5E9", detail:`Usually $${typicalAvg.toFixed(2)} avg — great deal!` };
     if (pct <= -0.08) return { label:"Below average price", icon:"🟢", color:"#2E7D32", bg:"#E8F5E9", detail:`Avg is $${typicalAvg.toFixed(2)} — good time to buy` };
     if (pct <= 0.05)  return { label:"Average price", icon:"🟡", color:"#F57F17", bg:"#FFF8E1", detail:`Typical range $${typicalLow.toFixed(2)}–$${typicalHigh.toFixed(2)}` };
     return { label:"Above average price", icon:"🔴", color:"#C62828", bg:"#FFEBEE", detail:`Avg is $${typicalAvg.toFixed(2)} — might want to wait` };
