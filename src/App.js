@@ -27,24 +27,23 @@ const IngredientBadge = ({ word, index }) => {
   );
 };
 
-// ── Dietary filter definitions ──
 const DIET_FILTERS = [
-  { id:"grain_free",        label:"Grain Free",          icon:"🌾",  desc:"No wheat, corn, or grains" },
-  { id:"limited_ingredient",label:"Limited Ingredient",  icon:"🧪",  desc:"Fewer ingredients, great for sensitive pets" },
-  { id:"hypoallergenic",    label:"Hypoallergenic",       icon:"💊",  desc:"Formulated to reduce allergic reactions" },
-  { id:"high_protein",      label:"High Protein",         icon:"💪",  desc:"More than 30% protein content" },
-  { id:"low_fat",           label:"Low Fat",              icon:"🥗",  desc:"Ideal for weight management" },
-  { id:"low_sodium",        label:"Low Sodium",           icon:"🧂",  desc:"Heart and kidney health support" },
-  { id:"weight_management", label:"Weight Management",    icon:"⚖️",  desc:"Calorie-controlled formula" },
-  { id:"senior",            label:"Senior Formula",       icon:"👴",  desc:"Formulated for older pets" },
-  { id:"puppy_kitten",      label:"Puppy / Kitten",       icon:"🍼",  desc:"Growth and development formula" },
-  { id:"no_chicken",        label:"No Chicken",           icon:"🚫🍗", desc:"Chicken-free for allergies" },
-  { id:"no_beef",           label:"No Beef",              icon:"🚫🥩", desc:"Beef-free for allergies" },
-  { id:"no_fish",           label:"No Fish",              icon:"🚫🐟", desc:"Fish-free for allergies" },
-  { id:"no_grain_corn",     label:"No Corn or Soy",       icon:"🌽",  desc:"Avoids common filler allergens" },
-  { id:"no_dairy",          label:"No Dairy",             icon:"🥛",  desc:"Dairy-free formula" },
-  { id:"organic",           label:"Organic",              icon:"🌿",  desc:"USDA certified organic ingredients" },
-  { id:"no_artificial",     label:"No Artificial Additives",icon:"✅", desc:"No artificial colors, flavors, or preservatives" },
+  { id:"grain_free",        label:"Grain Free",             icon:"🌾", desc:"No wheat, corn, or grains" },
+  { id:"limited_ingredient",label:"Limited Ingredient",     icon:"🧪", desc:"Fewer ingredients, great for sensitive pets" },
+  { id:"hypoallergenic",    label:"Hypoallergenic",          icon:"💊", desc:"Formulated to reduce allergic reactions" },
+  { id:"high_protein",      label:"High Protein",            icon:"💪", desc:"More than 30% protein content" },
+  { id:"low_fat",           label:"Low Fat",                 icon:"🥗", desc:"Ideal for weight management" },
+  { id:"low_sodium",        label:"Low Sodium",              icon:"🧂", desc:"Heart and kidney health support" },
+  { id:"weight_management", label:"Weight Management",       icon:"⚖️", desc:"Calorie-controlled formula" },
+  { id:"senior",            label:"Senior Formula",          icon:"👴", desc:"Formulated for older pets" },
+  { id:"puppy_kitten",      label:"Puppy / Kitten",          icon:"🍼", desc:"Growth and development formula" },
+  { id:"no_chicken",        label:"No Chicken",              icon:"🚫🍗",desc:"Chicken-free for allergies" },
+  { id:"no_beef",           label:"No Beef",                 icon:"🚫🥩",desc:"Beef-free for allergies" },
+  { id:"no_fish",           label:"No Fish",                 icon:"🚫🐟",desc:"Fish-free for allergies" },
+  { id:"no_grain_corn",     label:"No Corn or Soy",          icon:"🌽", desc:"Avoids common filler allergens" },
+  { id:"no_dairy",          label:"No Dairy",                icon:"🥛", desc:"Dairy-free formula" },
+  { id:"organic",           label:"Organic",                 icon:"🌿", desc:"USDA certified organic ingredients" },
+  { id:"no_artificial",     label:"No Artificial Additives", icon:"✅", desc:"No artificial colors, flavors, or preservatives" },
 ];
 
 function buildDietPrompt(activeFilters) {
@@ -54,74 +53,35 @@ function buildDietPrompt(activeFilters) {
 }
 
 const DOG_SUGGESTIONS = [
-  "Blue Buffalo Life Protection Chicken & Brown Rice",
-  "Blue Buffalo Wilderness Chicken",
-  "Blue Buffalo Homestyle Recipe Chicken",
-  "Purina Pro Plan Chicken & Rice Adult",
-  "Purina Pro Plan Salmon & Rice Adult",
-  "Purina Pro Plan Puppy Chicken & Rice",
-  "Purina ONE SmartBlend Chicken & Rice",
-  "Purina ONE Natural Lamb & Rice",
-  "Purina Dog Chow Complete Adult",
-  "Purina Puppy Chow Complete Nutrition",
-  "Hill's Science Diet Adult Chicken & Barley",
-  "Hill's Science Diet Puppy Chicken Meal & Barley",
-  "Hill's Science Diet Senior 7+ Chicken",
-  "Royal Canin Adult Breed Health Nutrition",
-  "Royal Canin Medium Adult",
-  "Royal Canin Puppy",
-  "Pedigree Adult Complete Nutrition",
-  "Pedigree Puppy Complete Nutrition",
-  "Iams ProActive Health Adult MiniChunks",
-  "Iams ProActive Health Puppy",
-  "Eukanuba Adult Medium Breed",
-  "Eukanuba Puppy Medium Breed",
-  "Diamond Naturals Adult Lamb & Rice",
-  "Diamond Naturals Large Breed Adult",
-  "Diamond Naturals Puppy",
-  "Taste of the Wild High Prairie",
-  "Taste of the Wild Pacific Stream",
-  "Taste of the Wild Sierra Mountain",
-  "Merrick Grain Free Real Chicken",
-  "Merrick Classic Real Chicken & Sweet Potato",
-  "Wellness CORE Grain Free Original",
-  "Wellness Complete Health Adult Deboned Chicken",
-  "Nutro Natural Choice Adult Chicken & Brown Rice",
-  "Nutro Ultra Adult",
-  "Orijen Original",
-  "Orijen Puppy",
-  "Acana Grasslands",
-  "Acana Heritage Free-Run Poultry",
-  "Fromm Gold Adult",
-  "Fromm Four-Star Salmon & Chicken Pate",
-  "4Health Adult Chicken & Rice",
-  "4Health Puppy Chicken & Rice",
-  "Kirkland Signature Adult Chicken Rice & Vegetable",
-  "Kirkland Signature Puppy Chicken Rice & Vegetable",
-  "Victor Classic Hi-Pro Plus",
-  "Victor Select Beef Meal & Brown Rice",
-  "Sportmix Wholesome Chicken Meal & Rice",
-  "Retriever Adult Dog Food",
-  "Ol Roy Complete Nutrition",
+  "Blue Buffalo Life Protection Chicken & Brown Rice","Blue Buffalo Wilderness Chicken","Blue Buffalo Homestyle Recipe Chicken",
+  "Purina Pro Plan Chicken & Rice Adult","Purina Pro Plan Salmon & Rice Adult","Purina Pro Plan Puppy Chicken & Rice",
+  "Purina ONE SmartBlend Chicken & Rice","Purina ONE Natural Lamb & Rice","Purina Dog Chow Complete Adult","Purina Puppy Chow Complete Nutrition",
+  "Hill's Science Diet Adult Chicken & Barley","Hill's Science Diet Puppy Chicken Meal & Barley","Hill's Science Diet Senior 7+ Chicken",
+  "Royal Canin Adult Breed Health Nutrition","Royal Canin Medium Adult","Royal Canin Puppy",
+  "Pedigree Adult Complete Nutrition","Pedigree Puppy Complete Nutrition",
+  "Iams ProActive Health Adult MiniChunks","Iams ProActive Health Puppy",
+  "Eukanuba Adult Medium Breed","Eukanuba Puppy Medium Breed",
+  "Diamond Naturals Adult Lamb & Rice","Diamond Naturals Large Breed Adult","Diamond Naturals Puppy",
+  "Taste of the Wild High Prairie","Taste of the Wild Pacific Stream","Taste of the Wild Sierra Mountain",
+  "Merrick Grain Free Real Chicken","Merrick Classic Real Chicken & Sweet Potato",
+  "Wellness CORE Grain Free Original","Wellness Complete Health Adult Deboned Chicken",
+  "Nutro Natural Choice Adult Chicken & Brown Rice","Nutro Ultra Adult",
+  "Orijen Original","Orijen Puppy","Acana Grasslands","Acana Heritage Free-Run Poultry",
+  "Fromm Gold Adult","Fromm Four-Star Salmon & Chicken Pate",
+  "4Health Adult Chicken & Rice","4Health Puppy Chicken & Rice",
+  "Kirkland Signature Adult Chicken Rice & Vegetable","Kirkland Signature Puppy Chicken Rice & Vegetable",
+  "Victor Classic Hi-Pro Plus","Victor Select Beef Meal & Brown Rice",
+  "Sportmix Wholesome Chicken Meal & Rice","Retriever Adult Dog Food","Ol Roy Complete Nutrition",
   "Natural Balance L.I.D. Sweet Potato & Fish",
 ];
 
 const CAT_SUGGESTIONS = [
-  "Blue Buffalo Adult Chicken & Brown Rice",
-  "Blue Buffalo Wilderness Chicken Adult",
-  "Purina ONE Tender Selects Chicken",
-  "Purina Cat Chow Complete",
-  "Purina Pro Plan Adult Salmon & Rice",
-  "Hill's Science Diet Adult Indoor",
-  "Royal Canin Indoor Adult",
-  "Friskies Seafood Sensations",
-  "Fancy Feast Grilled Chicken",
-  "Meow Mix Original Choice",
-  "Iams ProActive Health Indoor Weight & Hairball",
-  "Wellness CORE Grain Free Indoor",
-  "Taste of the Wild Rocky Mountain",
-  "Natural Balance L.I.D. Green Pea & Salmon",
-  "Diamond Naturals Indoor Cat",
+  "Blue Buffalo Adult Chicken & Brown Rice","Blue Buffalo Wilderness Chicken Adult",
+  "Purina ONE Tender Selects Chicken","Purina Cat Chow Complete","Purina Pro Plan Adult Salmon & Rice",
+  "Hill's Science Diet Adult Indoor","Royal Canin Indoor Adult",
+  "Friskies Seafood Sensations","Fancy Feast Grilled Chicken","Meow Mix Original Choice",
+  "Iams ProActive Health Indoor Weight & Hairball","Wellness CORE Grain Free Indoor",
+  "Taste of the Wild Rocky Mountain","Natural Balance L.I.D. Green Pea & Salmon","Diamond Naturals Indoor Cat",
 ];
 
 const DOG_SVG = (
@@ -136,12 +96,10 @@ const DOG_SVG = (
     <circle cx="53" cy="49" r="2" fill="white"/><circle cx="69" cy="49" r="2" fill="white"/>
     <ellipse cx="60" cy="60" rx="9" ry="6" fill="#D85A30"/>
     <ellipse cx="60" cy="62" rx="6" ry="4" fill="#F0997B"/>
-    <ellipse cx="40" cy="72" rx="8" ry="5" fill="#BA7517"/>
-    <ellipse cx="80" cy="72" rx="8" ry="5" fill="#BA7517"/>
+    <ellipse cx="40" cy="72" rx="8" ry="5" fill="#BA7517"/><ellipse cx="80" cy="72" rx="8" ry="5" fill="#BA7517"/>
     <ellipse cx="60" cy="88" rx="12" ry="8" fill="#BA7517"/>
     <path d="M50 92 Q60 100 70 92" stroke="#D85A30" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <ellipse cx="47" cy="68" rx="4" ry="3" fill="#2C2C2A"/>
-    <ellipse cx="73" cy="68" rx="4" ry="3" fill="#2C2C2A"/>
+    <ellipse cx="47" cy="68" rx="4" ry="3" fill="#2C2C2A"/><ellipse cx="73" cy="68" rx="4" ry="3" fill="#2C2C2A"/>
     <ellipse cx="60" cy="57" rx="4" ry="3" fill="#E24B4A"/>
   </svg>
 );
@@ -150,14 +108,10 @@ const CAT_SVG = (
   <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="60" cy="75" rx="30" ry="26" fill="#AFA9EC"/>
     <ellipse cx="60" cy="52" rx="24" ry="22" fill="#AFA9EC"/>
-    <polygon points="36,36 30,10 48,28" fill="#7F77DD"/>
-    <polygon points="84,36 90,10 72,28" fill="#7F77DD"/>
-    <polygon points="37,35 33,14 47,29" fill="#F4C0D1"/>
-    <polygon points="83,35 87,14 73,29" fill="#F4C0D1"/>
-    <ellipse cx="52" cy="50" rx="6" ry="7" fill="#1D9E75"/>
-    <ellipse cx="68" cy="50" rx="6" ry="7" fill="#1D9E75"/>
-    <ellipse cx="52" cy="51" rx="3" ry="5" fill="#2C2C2A"/>
-    <ellipse cx="68" cy="51" rx="3" ry="5" fill="#2C2C2A"/>
+    <polygon points="36,36 30,10 48,28" fill="#7F77DD"/><polygon points="84,36 90,10 72,28" fill="#7F77DD"/>
+    <polygon points="37,35 33,14 47,29" fill="#F4C0D1"/><polygon points="83,35 87,14 73,29" fill="#F4C0D1"/>
+    <ellipse cx="52" cy="50" rx="6" ry="7" fill="#1D9E75"/><ellipse cx="68" cy="50" rx="6" ry="7" fill="#1D9E75"/>
+    <ellipse cx="52" cy="51" rx="3" ry="5" fill="#2C2C2A"/><ellipse cx="68" cy="51" rx="3" ry="5" fill="#2C2C2A"/>
     <circle cx="51" cy="49" r="1.5" fill="white"/><circle cx="67" cy="49" r="1.5" fill="white"/>
     <ellipse cx="60" cy="59" rx="5" ry="4" fill="#ED93B1"/>
     <path d="M55 63 Q60 67 65 63" stroke="#D4537E" strokeWidth="2" fill="none" strokeLinecap="round"/>
@@ -175,10 +129,10 @@ const CAT_SVG = (
 const STORES = ["PetSmart","Petco","Walmart","Chewy","Amazon","Target","Tractor Supply","Pet Supplies Plus"];
 
 const BADGES = [
-  { min:0,  max:0,   label:"Pup",           icon:"🐶" },
-  { min:1,  max:4,   label:"Bone Collector", icon:"🦴" },
-  { min:5,  max:14,  label:"Pack Leader",    icon:"🐾" },
-  { min:15, max:999, label:"Top Sniffer",    icon:"🥇" },
+  { min:0,  max:0,   label:"Pup",            icon:"🐶" },
+  { min:1,  max:4,   label:"Bone Collector",  icon:"🦴" },
+  { min:5,  max:14,  label:"Pack Leader",     icon:"🐾" },
+  { min:15, max:999, label:"Top Sniffer",     icon:"🥇" },
 ];
 function getBadge(count) { return BADGES.find(b => count >= b.min && count <= b.max) || BADGES[0]; }
 
@@ -202,6 +156,31 @@ function getHealthScore(prod) {
   return good * 2 - bad * 3;
 }
 
+// ── Price Alert helpers ──
+function loadAlerts() {
+  try { return JSON.parse(localStorage.getItem("pawprice_alerts") || "[]"); } catch { return []; }
+}
+function saveAlerts(alerts) {
+  localStorage.setItem("pawprice_alerts", JSON.stringify(alerts));
+}
+function checkAlerts(alerts, results) {
+  if (!results || results.length === 0) return [];
+  const triggered = [];
+  alerts.forEach(alert => {
+    results.forEach(prod => {
+      if (prod.name.toLowerCase().includes(alert.productName.toLowerCase()) ||
+          alert.productName.toLowerCase().includes(prod.name.toLowerCase())) {
+        const minPrice = Math.min(...prod.prices.map(p => p.price));
+        const bestStore = [...prod.prices].sort((a,b) => a.price - b.price)[0];
+        if (minPrice <= alert.targetPrice) {
+          triggered.push({ alert, prod, minPrice, bestStore });
+        }
+      }
+    });
+  });
+  return triggered;
+}
+
 export default function App() {
   const [tab, setTab]                         = useState("search");
   const [pet, setPet]                         = useState("dogs");
@@ -213,7 +192,6 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [error, setError]                     = useState("");
 
-  // ── Dietary filters state ──
   const [activeFilters, setActiveFilters]     = useState([]);
   const [showFilters, setShowFilters]         = useState(false);
 
@@ -236,31 +214,38 @@ export default function App() {
   const [petForm, setPetForm] = useState({ name:"", type:"dogs", food:"", dietaryNeeds:[] });
   const [petSaved, setPetSaved] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem("pawprice_pets", JSON.stringify(myPets));
-  }, [myPets]);
+  // ── Price Alert state ──
+  const [alerts, setAlerts]                   = useState(loadAlerts);
+  const [triggeredAlerts, setTriggeredAlerts] = useState([]);
+  const [showAlertModal, setShowAlertModal]   = useState(false);
+  const [alertProduct, setAlertProduct]       = useState(null);
+  const [alertTargetPrice, setAlertTargetPrice] = useState("");
+  const [alertSaved, setAlertSaved]           = useState(false);
+  const [dismissedAlerts, setDismissedAlerts] = useState([]);
 
+  useEffect(() => { localStorage.setItem("pawprice_pets", JSON.stringify(myPets)); }, [myPets]);
+  useEffect(() => { saveAlerts(alerts); }, [alerts]);
+  useEffect(() => { setSortResults("default"); }, [results]);
+
+  // Check alerts whenever results change
   useEffect(() => {
-    setSortResults("default");
-  }, [results]);
+    if (results && alerts.length > 0) {
+      const triggered = checkAlerts(alerts, results);
+      setTriggeredAlerts(triggered);
+    } else {
+      setTriggeredAlerts([]);
+    }
+  }, [results, alerts]);
 
   useEffect(() => {
     if (!selectedProduct) { setIngText(null); setIngSource(null); setIngDisclaimer(false); return; }
-    setIngLoading(true);
-    setIngText(null);
-    setIngSource(null);
-    setIngDisclaimer(false);
+    setIngLoading(true); setIngText(null); setIngSource(null); setIngDisclaimer(false);
     fetch("/api/ingredients", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ productName: selectedProduct.name }),
     })
       .then(r => r.json())
-      .then(data => {
-        setIngText(data.ingredients || "unavailable");
-        setIngSource(data.source || "none");
-        setIngDisclaimer(data.aiDisclaimer || false);
-      })
+      .then(data => { setIngText(data.ingredients || "unavailable"); setIngSource(data.source || "none"); setIngDisclaimer(data.aiDisclaimer || false); })
       .catch(() => { setIngText("unavailable"); setIngSource("none"); })
       .finally(() => setIngLoading(false));
   }, [selectedProduct]);
@@ -269,15 +254,40 @@ export default function App() {
   const accentLight = pet === "dogs" ? "#FAEEDA" : "#EEEDFE";
 
   function toggleFilter(id) {
-    setActiveFilters(prev =>
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    );
+    setActiveFilters(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   }
-
   function clearFilters() { setActiveFilters([]); }
 
-  function getStoreLink(store, productName, brandName) {
-    const brand = encodeURIComponent(brandName || productName.split(' ').slice(0,2).join(' '));
+  // ── Alert functions ──
+  function openAlertModal(prod) { setAlertProduct(prod); setAlertTargetPrice(""); setAlertSaved(false); setShowAlertModal(true); }
+  function closeAlertModal() { setShowAlertModal(false); setAlertProduct(null); }
+
+  function saveAlert() {
+    if (!alertProduct || !alertTargetPrice || isNaN(parseFloat(alertTargetPrice))) return;
+    const newAlert = {
+      id: Date.now(),
+      productName: alertProduct.name,
+      brand: alertProduct.brand,
+      targetPrice: parseFloat(alertTargetPrice),
+      pet,
+      createdAt: Date.now(),
+    };
+    setAlerts(prev => {
+      const filtered = prev.filter(a => a.productName !== newAlert.productName);
+      return [...filtered, newAlert];
+    });
+    setAlertSaved(true);
+    setTimeout(() => { closeAlertModal(); }, 1200);
+  }
+
+  function deleteAlert(id) { setAlerts(prev => prev.filter(a => a.id !== id)); }
+
+  function dismissTriggeredAlert(alertId) {
+    setDismissedAlerts(prev => [...prev, alertId]);
+  }
+
+  function getStoreLink(store, productName) {
+    const brand = encodeURIComponent(productName.split(' ').slice(0,2).join(' '));
     const full  = encodeURIComponent(productName);
     const links = {
       "Amazon":         `https://www.amazon.com/s?k=${full}&i=pet-supplies&tag=pawprice-20`,
@@ -295,29 +305,18 @@ export default function App() {
     if (!petForm.name.trim() || !petForm.food.trim()) return;
     setMyPets(prev => [...prev, { id:Date.now(), ...petForm }]);
     setPetForm({ name:"", type:"dogs", food:"", dietaryNeeds:[] });
-    setPetSaved(true);
-    setTimeout(() => setPetSaved(false), 2000);
+    setPetSaved(true); setTimeout(() => setPetSaved(false), 2000);
   }
   function deletePet(id) { setMyPets(prev => prev.filter(p => p.id !== id)); }
   function searchForPet(p) {
-    setPet(p.type);
-    setSearch(p.food);
-    setTab("search");
-    setResults(null);
-    setSelectedProduct(null);
-    setError("");
-    // Apply pet's saved dietary needs as active filters
-    if (p.dietaryNeeds && p.dietaryNeeds.length > 0) {
-      setActiveFilters(p.dietaryNeeds);
-    }
+    setPet(p.type); setSearch(p.food); setTab("search");
+    setResults(null); setSelectedProduct(null); setError("");
+    if (p.dietaryNeeds && p.dietaryNeeds.length > 0) setActiveFilters(p.dietaryNeeds);
   }
-
   function togglePetDiet(id) {
     setPetForm(prev => ({
       ...prev,
-      dietaryNeeds: prev.dietaryNeeds.includes(id)
-        ? prev.dietaryNeeds.filter(f => f !== id)
-        : [...prev.dietaryNeeds, id]
+      dietaryNeeds: prev.dietaryNeeds.includes(id) ? prev.dietaryNeeds.filter(f => f !== id) : [...prev.dietaryNeeds, id]
     }));
   }
 
@@ -327,29 +326,23 @@ export default function App() {
     const dietPrompt = buildDietPrompt(activeFilters);
     try {
       const response = await fetch("/api/search", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
+        method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          model:"claude-haiku-4-5-20251001",
-          max_tokens:1500,
+          model:"claude-haiku-4-5-20251001", max_tokens:1500,
           messages:[{ role:"user", content:`You are a pet food price comparison assistant. The user is searching for "${search}" for their ${pet}.${dietPrompt}
 
-STRICT RULES - follow exactly:
-1. Only return products that ACTUALLY EXIST and are made for ${pet}. Never invent or fabricate products.
-2. NEVER mix brands with animal types they don't serve. Examples: Friskies, Fancy Feast, and Meow Mix are CAT-ONLY brands. Pedigree, Purina Puppy Chow, Milk-Bone, and Ol' Roy are DOG-ONLY brands. If the search does not match any real products made for ${pet}, return an empty array [].
-3. Every brand name, product name, and size must be real and verifiable.
-4. The "stage" field must accurately reflect the real product (do NOT label an adult formula as Puppy or Kitten).
-5. Prices must be realistic for that product's actual market price.
-6. Not every store carries every product. If a store does not realistically carry the product, use your best estimate of a realistic price — but NEVER use 0 or null.
-7. CRITICAL: Every single price value must be a real positive number greater than 0. If you do not know the price for a store, estimate based on similar products. A price of 0 is never acceptable.
-8. If you are not confident enough to provide realistic prices for a product, do not include it in the results at all.
-9. Each product object must include a "dietaryTags" array listing which of these apply: grain_free, limited_ingredient, hypoallergenic, high_protein, low_fat, low_sodium, weight_management, senior, puppy_kitten, no_chicken, no_beef, no_fish, no_grain_corn, no_dairy, organic, no_artificial.
+STRICT RULES:
+1. Only return products that ACTUALLY EXIST and are made for ${pet}. Never invent products.
+2. NEVER mix brands with animal types they don't serve. Friskies, Fancy Feast, Meow Mix = CAT ONLY. Pedigree, Puppy Chow, Milk-Bone, Ol Roy = DOG ONLY.
+3. Every brand, product name, and size must be real and verifiable.
+4. Stage field must accurately reflect the real product.
+5. Prices must be realistic. Never use 0 or null.
+6. Each product must include a "dietaryTags" array listing which apply: grain_free, limited_ingredient, hypoallergenic, high_protein, low_fat, low_sodium, weight_management, senior, puppy_kitten, no_chicken, no_beef, no_fish, no_grain_corn, no_dairy, organic, no_artificial.
 
-Return a JSON array of up to 4 real matching products. Each product must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), and a prices array with store and price for every store in this list: ${STORES.join(", ")}.
+Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), and prices array with store and price for: ${STORES.join(", ")}.
 
-If no real products match the search for ${pet}, return: []
-
-Return ONLY valid JSON, no markdown, no explanation.` }]
+If no real products match for ${pet}, return: []
+Return ONLY valid JSON, no markdown.` }]
         })
       });
       const data = await response.json();
@@ -357,9 +350,7 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
       const text  = data.content.map(c => c.text || "").join("");
       const clean = text.replace(/```json|```/g,"").trim();
       const parsed = JSON.parse(clean);
-      const valid = parsed.filter(p =>
-        p.prices && p.prices.length > 0 && p.prices.every(s => s.price > 0)
-      );
+      const valid = parsed.filter(p => p.prices && p.prices.length > 0 && p.prices.every(s => s.price > 0));
       setResults(valid);
     } catch(e) { setError("Search failed: " + e.message); }
     setLoading(false);
@@ -374,6 +365,10 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
     if (sortResults === "price")  return copy.sort((a,b) => getMin(a.prices) - getMin(b.prices));
     if (sortResults === "health") return copy.sort((a,b) => getHealthScore(b) - getHealthScore(a));
     return copy;
+  }
+
+  function hasAlert(prodName) {
+    return alerts.some(a => a.productName.toLowerCase() === prodName.toLowerCase());
   }
 
   function submitDeal() {
@@ -403,21 +398,54 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
   });
 
   const ingredientList = ingText && ingText !== "unavailable"
-    ? ingText.split(/,(?![^()]*\))/).map(s=>s.trim()).filter(Boolean)
-    : [];
+    ? ingText.split(/,(?![^()]*\))/).map(s=>s.trim()).filter(Boolean) : [];
   const { good, bad } = qualityFlags(ingText || "");
   const score      = Math.min(100, Math.max(0, 50 + good.length*12 - bad.length*18));
   const scoreColor = score >= 70 ? "#2E7D32" : score >= 45 ? "#F57F17" : "#C62828";
   const scoreBg    = score >= 70 ? "#E8F5E9" : score >= 45 ? "#FFF8E1" : "#FFEBEE";
   const scoreLabel = score >= 70 ? "Good" : score >= 45 ? "Fair" : "Poor";
+  const sourceLabel = ingSource === "opff" ? "Open Pet Food Facts" : ingSource === "chewy" ? "Chewy" : ingSource === "ai" ? "AI-generated · verify on manufacturer's site" : null;
 
-  const sourceLabel = ingSource === "opff" ? "Open Pet Food Facts"
-    : ingSource === "chewy" ? "Chewy"
-    : ingSource === "ai" ? "AI-generated · verify on manufacturer's site"
-    : null;
+  const visibleTriggered = triggeredAlerts.filter(t => !dismissedAlerts.includes(t.alert.id));
 
   return (
     <div style={{fontFamily:"sans-serif",maxWidth:720,margin:"0 auto",padding:"1rem 1rem 2rem"}}>
+
+      {/* ── Price Alert Modal ── */}
+      {showAlertModal && alertProduct && (
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"white",borderRadius:16,padding:"24px 20px",maxWidth:380,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
+            <div style={{fontSize:24,marginBottom:4}}>🔔</div>
+            <div style={{fontWeight:500,fontSize:17,marginBottom:4}}>Set Price Alert</div>
+            <div style={{fontSize:13,color:"#666",marginBottom:16}}>{alertProduct.name}</div>
+            <div style={{fontSize:13,color:"#444",marginBottom:6}}>Alert me when the price drops below:</div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <span style={{fontSize:18,color:"#666"}}>$</span>
+              <input
+                type="number"
+                value={alertTargetPrice}
+                onChange={e => setAlertTargetPrice(e.target.value)}
+                placeholder={`e.g. ${(getMin(alertProduct.prices) - 5).toFixed(2)}`}
+                style={{flex:1,padding:"10px 12px",borderRadius:8,border:`1.5px solid ${accent}`,fontSize:16,outline:"none"}}
+                autoFocus
+              />
+            </div>
+            <div style={{fontSize:12,color:"#999",marginBottom:16}}>
+              Current lowest price: <strong style={{color:accent}}>${getMin(alertProduct.prices).toFixed(2)}</strong> at {[...alertProduct.prices].sort((a,b)=>a.price-b.price)[0].store}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={closeAlertModal}
+                style={{flex:1,padding:"10px",borderRadius:8,border:"1px solid #ddd",background:"transparent",color:"#666",cursor:"pointer",fontSize:14}}>
+                Cancel
+              </button>
+              <button onClick={saveAlert}
+                style={{flex:2,padding:"10px",borderRadius:8,border:"none",background:accent,color:"white",cursor:"pointer",fontSize:14,fontWeight:500}}>
+                {alertSaved ? "Saved! ✓" : "Set Alert"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
         <div style={{flexShrink:0}}>{pet==="dogs"?DOG_SVG:CAT_SVG}</div>
@@ -425,10 +453,19 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
           <div style={{fontSize:26,fontWeight:500,lineHeight:1}}>🐾 PawPrice</div>
           <div style={{fontSize:14,color:"#666",marginTop:4}}>AI-powered pet food price comparison</div>
         </div>
+        {alerts.length > 0 && (
+          <button onClick={()=>setTab("alerts")}
+            style={{position:"relative",background:"transparent",border:"none",cursor:"pointer",fontSize:22,padding:4}}>
+            🔔
+            <span style={{position:"absolute",top:0,right:0,background:"#E24B4A",color:"white",borderRadius:"50%",width:16,height:16,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:500}}>
+              {alerts.length}
+            </span>
+          </button>
+        )}
       </div>
 
       <div style={{display:"flex",gap:4,marginBottom:20,background:"#f5f5f5",padding:4,borderRadius:24,flexWrap:"wrap"}}>
-        {[["search","Search Prices"],["mypets","My Pets"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
+        {[["search","Search Prices"],["alerts",`🔔 Alerts${alerts.length>0?" ("+alerts.length+")":""}`],["mypets","My Pets"],["deals","Community Deals"],["leaderboard","Leaderboard"]].map(([t,l])=>(
           <button key={t} style={tabStyle(t)} onClick={()=>setTab(t)}>{l}</button>
         ))}
       </div>
@@ -457,7 +494,7 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                     onKeyDown={e=>{if(e.key==="Enter"){setShowSuggestions(false);searchProducts();}if(e.key==="Escape")setShowSuggestions(false);}}
                     onFocus={()=>setShowSuggestions(true)}
                     onBlur={()=>setTimeout(()=>setShowSuggestions(false),150)}
-                    placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food… or describe needs`}
+                    placeholder={`Search any ${pet==="dogs"?"dog":"cat"} food…`}
                     style={{flex:1,padding:"11px 16px",borderRadius:12,border:`1.5px solid ${accent}`,fontSize:14,outline:"none"}}/>
                   <button onClick={()=>{setShowSuggestions(false);searchProducts();}} disabled={loading}
                     style={{padding:"11px 22px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,opacity:loading?0.7:1}}>
@@ -474,8 +511,7 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                           style={{padding:"10px 16px",cursor:"pointer",fontSize:14,borderBottom:i<filtered.length-1?"1px solid #f5f5f5":"none",display:"flex",alignItems:"center",gap:10}}
                           onMouseEnter={e=>e.currentTarget.style.background="#f9f9f9"}
                           onMouseLeave={e=>e.currentTarget.style.background="white"}>
-                          <span style={{color:accent,fontSize:16}}>🔍</span>
-                          <span>{s}</span>
+                          <span style={{color:accent,fontSize:16}}>🔍</span><span>{s}</span>
                         </div>
                       ))}
                     </div>
@@ -483,7 +519,7 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                 })()}
               </div>
 
-              {/* ── Dietary Filter Section ── */}
+              {/* Dietary Filters */}
               <div style={{marginBottom:14}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,flexWrap:"wrap"}}>
                   <button onClick={()=>setShowFilters(f=>!f)}
@@ -491,8 +527,7 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                       border:`1.5px solid ${activeFilters.length>0?accent:"#ddd"}`,
                       background:activeFilters.length>0?accentLight:"white",
                       color:activeFilters.length>0?accent:"#666",cursor:"pointer",fontSize:13,fontWeight:500}}>
-                    <span>🔬</span>
-                    <span>Dietary Filters</span>
+                    <span>🔬</span><span>Dietary Filters</span>
                     {activeFilters.length>0&&<span style={{background:accent,color:"white",borderRadius:10,padding:"1px 7px",fontSize:11}}>{activeFilters.length}</span>}
                     <span style={{fontSize:11}}>{showFilters?"▲":"▼"}</span>
                   </button>
@@ -502,56 +537,43 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                       Clear all
                     </button>
                   )}
-                  {/* Active filter chips */}
                   {activeFilters.map(id=>{
-                    const f = DIET_FILTERS.find(f=>f.id===id);
-                    return f ? (
-                      <span key={id} style={{display:"inline-flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:16,
-                        background:accentLight,color:accent,fontSize:12,fontWeight:500}}>
+                    const f=DIET_FILTERS.find(f=>f.id===id);
+                    return f?(
+                      <span key={id} style={{display:"inline-flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:16,background:accentLight,color:accent,fontSize:12,fontWeight:500}}>
                         {f.icon} {f.label}
                         <span onClick={()=>toggleFilter(id)} style={{cursor:"pointer",marginLeft:2,opacity:0.7}}>✕</span>
                       </span>
-                    ) : null;
+                    ):null;
                   })}
                 </div>
-
                 {showFilters && (
                   <div style={{background:"white",border:`1px solid ${accent}33`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
-                    <div style={{fontSize:12,color:"#666",marginBottom:10,fontWeight:500}}>Select your pet's dietary needs — AI will filter results automatically</div>
-
-                    {/* Health conditions */}
+                    <div style={{fontSize:12,color:"#666",marginBottom:10,fontWeight:500}}>Select dietary needs — AI will filter results automatically</div>
                     <div style={{fontSize:11,color:"#999",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Health & Lifestyle</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
                       {DIET_FILTERS.slice(0,9).map(f=>(
-                        <button key={f.id} onClick={()=>toggleFilter(f.id)}
-                          title={f.desc}
+                        <button key={f.id} onClick={()=>toggleFilter(f.id)} title={f.desc}
                           style={{display:"flex",alignItems:"center",gap:5,padding:"6px 12px",borderRadius:18,
                             border:`1.5px solid ${activeFilters.includes(f.id)?accent:"#e0e0e0"}`,
                             background:activeFilters.includes(f.id)?accentLight:"#fafafa",
                             color:activeFilters.includes(f.id)?accent:"#555",
-                            cursor:"pointer",fontSize:12,fontWeight:activeFilters.includes(f.id)?600:400,
-                            transition:"all 0.15s"}}>
-                          <span>{f.icon}</span>
-                          <span>{f.label}</span>
+                            cursor:"pointer",fontSize:12,fontWeight:activeFilters.includes(f.id)?600:400,transition:"all 0.15s"}}>
+                          <span>{f.icon}</span><span>{f.label}</span>
                           {activeFilters.includes(f.id)&&<span style={{fontSize:10}}>✓</span>}
                         </button>
                       ))}
                     </div>
-
-                    {/* Allergen exclusions */}
                     <div style={{fontSize:11,color:"#999",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Allergen Exclusions</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
                       {DIET_FILTERS.slice(9).map(f=>(
-                        <button key={f.id} onClick={()=>toggleFilter(f.id)}
-                          title={f.desc}
+                        <button key={f.id} onClick={()=>toggleFilter(f.id)} title={f.desc}
                           style={{display:"flex",alignItems:"center",gap:5,padding:"6px 12px",borderRadius:18,
                             border:`1.5px solid ${activeFilters.includes(f.id)?"#E24B4A":"#e0e0e0"}`,
                             background:activeFilters.includes(f.id)?"#FFEBEE":"#fafafa",
                             color:activeFilters.includes(f.id)?"#C62828":"#555",
-                            cursor:"pointer",fontSize:12,fontWeight:activeFilters.includes(f.id)?600:400,
-                            transition:"all 0.15s"}}>
-                          <span>{f.icon}</span>
-                          <span>{f.label}</span>
+                            cursor:"pointer",fontSize:12,fontWeight:activeFilters.includes(f.id)?600:400,transition:"all 0.15s"}}>
+                          <span>{f.icon}</span><span>{f.label}</span>
                           {activeFilters.includes(f.id)&&<span style={{fontSize:10}}>✓</span>}
                         </button>
                       ))}
@@ -564,7 +586,9 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                 <span style={{background:accentLight,color:accent,padding:"3px 10px",borderRadius:10,fontWeight:500}}>✨ AI-powered</span>
                 <span>Real brands, estimated prices across 8 major retailers</span>
               </div>
+
               {error && <div style={{color:"#E24B4A",fontSize:14,marginBottom:12}}>{error}</div>}
+
               {loading && (
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:32,marginBottom:8}}>🔍</div>
@@ -573,22 +597,40 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                   </div>
                 </div>
               )}
+
               {!loading && !results && (
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:40,marginBottom:8}}>{pet==="dogs"?"🐶":"🐱"}</div>
                   <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>Search any pet food</div>
-                  <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult" or use Dietary Filters above for allergy-friendly results</div>
+                  <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult" or use Dietary Filters for allergy-friendly results</div>
                 </div>
               )}
+
               {results && results.length===0 && (
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:40,marginBottom:8}}>🔎</div>
                   <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>No matching products found</div>
-                  <div style={{fontSize:13}}>
-                    {activeFilters.length>0
-                      ? "Try removing some dietary filters or broadening your search."
-                      : `Try a different search — make sure the brand makes food for ${pet==="dogs"?"dogs":"cats"}!`}
-                  </div>
+                  <div style={{fontSize:13}}>{activeFilters.length>0?"Try removing some dietary filters or broadening your search.":  `Try a different search — make sure the brand makes food for ${pet==="dogs"?"dogs":"cats"}!`}</div>
+                </div>
+              )}
+
+              {/* ── Triggered Alert Banners ── */}
+              {visibleTriggered.length > 0 && (
+                <div style={{marginBottom:16}}>
+                  {visibleTriggered.map(({alert, prod, minPrice, bestStore}) => (
+                    <div key={alert.id} style={{background:"#E8F5E9",border:"1.5px solid #81C784",borderRadius:12,padding:"12px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      <div>
+                        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
+                          <span style={{fontSize:16}}>🔔</span>
+                          <span style={{fontWeight:500,fontSize:13,color:"#2E7D32"}}>Price Alert Hit!</span>
+                        </div>
+                        <div style={{fontSize:12,color:"#444"}}>{prod.name}</div>
+                        <div style={{fontSize:12,color:"#2E7D32",fontWeight:500}}>${minPrice.toFixed(2)} at {bestStore.store} — under your ${alert.targetPrice.toFixed(2)} target!</div>
+                      </div>
+                      <button onClick={()=>dismissTriggeredAlert(alert.id)}
+                        style={{background:"transparent",border:"none",color:"#999",cursor:"pointer",fontSize:18,padding:4}}>✕</button>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -596,25 +638,16 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                 <>
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,flexWrap:"wrap"}}>
                     <span style={{fontSize:13,color:"#666",fontWeight:500}}>Sort by:</span>
-                    {[
-                      { val:"default", label:"Relevance",       icon:"✦" },
-                      { val:"price",   label:"Lowest Price",     icon:"💰" },
-                      { val:"health",  label:"Healthiest First", icon:"🥦" },
-                    ].map(({ val, label, icon }) => (
-                      <button key={val} onClick={() => setSortResults(val)}
-                        style={{
-                          display:"flex", alignItems:"center", gap:5,
-                          padding:"6px 14px", borderRadius:20,
-                          border:`1.5px solid ${sortResults===val ? accent : "#ddd"}`,
-                          background: sortResults===val ? accentLight : "white",
-                          color: sortResults===val ? accent : "#666",
-                          cursor:"pointer", fontSize:12, fontWeight: sortResults===val ? 600 : 400,
-                          transition:"all 0.18s",
-                          boxShadow: sortResults===val ? `0 2px 8px ${accent}33` : "none",
-                        }}>
-                        <span>{icon}</span>
-                        <span>{label}</span>
-                        {sortResults===val && <span style={{fontSize:10}}>▼</span>}
+                    {[{val:"default",label:"Relevance",icon:"✦"},{val:"price",label:"Lowest Price",icon:"💰"},{val:"health",label:"Healthiest First",icon:"🥦"}].map(({val,label,icon})=>(
+                      <button key={val} onClick={()=>setSortResults(val)}
+                        style={{display:"flex",alignItems:"center",gap:5,padding:"6px 14px",borderRadius:20,
+                          border:`1.5px solid ${sortResults===val?accent:"#ddd"}`,
+                          background:sortResults===val?accentLight:"white",
+                          color:sortResults===val?accent:"#666",cursor:"pointer",fontSize:12,
+                          fontWeight:sortResults===val?600:400,transition:"all 0.18s",
+                          boxShadow:sortResults===val?`0 2px 8px ${accent}33`:"none"}}>
+                        <span>{icon}</span><span>{label}</span>
+                        {sortResults===val&&<span style={{fontSize:10}}>▼</span>}
                       </button>
                     ))}
                   </div>
@@ -626,53 +659,32 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                     </div>
                   )}
 
-                  {getSortedResults().map((prod, i) => {
-                    const minP = getMin(prod.prices);
-                    const maxP = getMax(prod.prices);
-                    const hs   = getHealthScore(prod);
-                    const healthBadge = hs >= 4
-                      ? { label:"Top Pick 🥦", bg:"#E8F5E9", color:"#2E7D32" }
-                      : hs >= 1
-                      ? { label:"Good Choice", bg:"#F1F8E9", color:"#558B2F" }
-                      : hs < 0
-                      ? { label:"Check Ingredients", bg:"#FFEBEE", color:"#C62828" }
-                      : null;
-
+                  {getSortedResults().map((prod,i)=>{
+                    const minP=getMin(prod.prices), maxP=getMax(prod.prices);
+                    const hs=getHealthScore(prod);
+                    const healthBadge=hs>=4?{label:"Top Pick 🥦",bg:"#E8F5E9",color:"#2E7D32"}:hs>=1?{label:"Good Choice",bg:"#F1F8E9",color:"#558B2F"}:hs<0?{label:"Check Ingredients",bg:"#FFEBEE",color:"#C62828"}:null;
+                    const alreadyAlerted = hasAlert(prod.name);
                     return (
-                      <div key={i} onClick={() => setSelectedProduct(prod)}
-                        style={{
-                          background:"white", border:"1px solid #eee", borderRadius:12,
-                          padding:"14px 16px", cursor:"pointer", marginBottom:10,
-                          transition:"box-shadow 0.2s, border-color 0.2s",
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.boxShadow="0 3px 14px rgba(0,0,0,0.09)"; e.currentTarget.style.borderColor=accent+"66"; }}
-                        onMouseLeave={e => { e.currentTarget.style.boxShadow="none"; e.currentTarget.style.borderColor="#eee"; }}>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                      <div key={i} style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",marginBottom:10,transition:"box-shadow 0.2s,border-color 0.2s"}}
+                        onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 3px 14px rgba(0,0,0,0.09)";e.currentTarget.style.borderColor=accent+"66";}}
+                        onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor="#eee";}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",cursor:"pointer"}} onClick={()=>setSelectedProduct(prod)}>
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{fontWeight:500,fontSize:15,marginBottom:2}}>{prod.name}</div>
                             <div style={{fontSize:12,color:"#666",marginBottom:6}}>{prod.brand} · {prod.type} · {prod.size} · {prod.stage}</div>
-                            {/* Dietary tags */}
-                            {prod.dietaryTags && prod.dietaryTags.length>0&&(
+                            {prod.dietaryTags&&prod.dietaryTags.length>0&&(
                               <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>
                                 {prod.dietaryTags.slice(0,4).map(tagId=>{
-                                  const tagDef = DIET_FILTERS.find(f=>f.id===tagId);
+                                  const tagDef=DIET_FILTERS.find(f=>f.id===tagId);
                                   if(!tagDef) return null;
-                                  const isAllergen = tagId.startsWith("no_");
-                                  return (
-                                    <span key={tagId} style={{fontSize:11,padding:"2px 8px",borderRadius:8,
-                                      background:isAllergen?"#FFEBEE":"#E8F5E9",
-                                      color:isAllergen?"#C62828":"#2E7D32"}}>
-                                      {tagDef.icon} {tagDef.label}
-                                    </span>
-                                  );
+                                  const isAllergen=tagId.startsWith("no_");
+                                  return <span key={tagId} style={{fontSize:11,padding:"2px 8px",borderRadius:8,background:isAllergen?"#FFEBEE":"#E8F5E9",color:isAllergen?"#C62828":"#2E7D32"}}>{tagDef.icon} {tagDef.label}</span>;
                                 })}
                                 {prod.dietaryTags.length>4&&<span style={{fontSize:11,color:"#999"}}>+{prod.dietaryTags.length-4} more</span>}
                               </div>
                             )}
-                            {sortResults==="health" && healthBadge && (
-                              <span style={{fontSize:11,padding:"2px 9px",borderRadius:8,background:healthBadge.bg,color:healthBadge.color,fontWeight:500}}>
-                                {healthBadge.label}
-                              </span>
+                            {sortResults==="health"&&healthBadge&&(
+                              <span style={{fontSize:11,padding:"2px 9px",borderRadius:8,background:healthBadge.bg,color:healthBadge.color,fontWeight:500}}>{healthBadge.label}</span>
                             )}
                           </div>
                           <div style={{textAlign:"right",flexShrink:0,marginLeft:12}}>
@@ -681,11 +693,19 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                             <div style={{fontSize:11,color:accent,marginTop:2}}>Compare →</div>
                           </div>
                         </div>
-                        {sortResults==="price" && i===0 && (
-                          <div style={{marginTop:8,fontSize:11,padding:"3px 10px",background:accentLight,color:accent,borderRadius:8,display:"inline-block",fontWeight:600}}>
-                            💰 Lowest price in results
-                          </div>
-                        )}
+                        {/* Set Alert button */}
+                        <div style={{marginTop:10,paddingTop:10,borderTop:"1px solid #f5f5f5",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                          <button onClick={()=>openAlertModal(prod)}
+                            style={{display:"flex",alignItems:"center",gap:5,padding:"6px 12px",borderRadius:16,
+                              border:`1px solid ${alreadyAlerted?"#639922":"#ddd"}`,
+                              background:alreadyAlerted?"#EAF3DE":"transparent",
+                              color:alreadyAlerted?"#3B6D11":"#888",cursor:"pointer",fontSize:12}}>
+                            {alreadyAlerted?"🔔 Alert set":"🔔 Set price alert"}
+                          </button>
+                          {sortResults==="price"&&i===0&&(
+                            <div style={{fontSize:11,padding:"3px 10px",background:accentLight,color:accent,borderRadius:8,fontWeight:600}}>💰 Lowest price</div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -698,23 +718,26 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                 style={{background:"transparent",border:"none",color:accent,cursor:"pointer",fontSize:14,fontWeight:500,marginBottom:14,padding:0}}>
                 ← Back to results
               </button>
-
               <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px",marginBottom:16}}>
-                <div style={{fontWeight:500,fontSize:17,marginBottom:2}}>{selectedProduct.name}</div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:2}}>
+                  <div style={{fontWeight:500,fontSize:17,flex:1}}>{selectedProduct.name}</div>
+                  <button onClick={()=>openAlertModal(selectedProduct)}
+                    style={{display:"flex",alignItems:"center",gap:5,padding:"7px 12px",borderRadius:16,
+                      border:`1px solid ${hasAlert(selectedProduct.name)?"#639922":accent}`,
+                      background:hasAlert(selectedProduct.name)?"#EAF3DE":accentLight,
+                      color:hasAlert(selectedProduct.name)?"#3B6D11":accent,
+                      cursor:"pointer",fontSize:12,fontWeight:500,flexShrink:0,marginLeft:10}}>
+                    🔔 {hasAlert(selectedProduct.name)?"Alert set":"Set alert"}
+                  </button>
+                </div>
                 <div style={{fontSize:13,color:"#666",marginBottom:8}}>{selectedProduct.brand} · {selectedProduct.type} · {selectedProduct.size} · {selectedProduct.stage}</div>
-                {selectedProduct.dietaryTags && selectedProduct.dietaryTags.length>0&&(
+                {selectedProduct.dietaryTags&&selectedProduct.dietaryTags.length>0&&(
                   <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:14}}>
                     {selectedProduct.dietaryTags.map(tagId=>{
-                      const tagDef = DIET_FILTERS.find(f=>f.id===tagId);
+                      const tagDef=DIET_FILTERS.find(f=>f.id===tagId);
                       if(!tagDef) return null;
-                      const isAllergen = tagId.startsWith("no_");
-                      return (
-                        <span key={tagId} style={{fontSize:11,padding:"3px 10px",borderRadius:10,
-                          background:isAllergen?"#FFEBEE":"#E8F5E9",
-                          color:isAllergen?"#C62828":"#2E7D32",fontWeight:500}}>
-                          {tagDef.icon} {tagDef.label}
-                        </span>
-                      );
+                      const isAllergen=tagId.startsWith("no_");
+                      return <span key={tagId} style={{fontSize:11,padding:"3px 10px",borderRadius:10,background:isAllergen?"#FFEBEE":"#E8F5E9",color:isAllergen?"#C62828":"#2E7D32",fontWeight:500}}>{tagDef.icon} {tagDef.label}</span>;
                     })}
                   </div>
                 )}
@@ -728,38 +751,31 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                       <span style={{fontSize:16,fontWeight:500,color:i===0?accent:"#333"}}>${p.price.toFixed(2)}</span>
                       <a href={getStoreLink(p.store,selectedProduct.name)} target="_blank" rel="noopener noreferrer"
                         style={{fontSize:12,color:accent,textDecoration:"none",border:`1px solid ${accent}`,borderRadius:6,padding:"4px 10px"}}>
-                        Buy at {p.store} →
+                        Buy →
                       </a>
                     </div>
                   </div>
                 ))}
                 <div style={{marginTop:14,padding:"10px 14px",background:accentLight,borderRadius:8,fontSize:13,color:"#666"}}>
-                  💡 Based on estimates, you could save up to <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
+                  💡 You could save up to <strong style={{color:accent}}>${(getMax(selectedProduct.prices)-getMin(selectedProduct.prices)).toFixed(2)}</strong> by choosing the best deal.
                 </div>
                 <div style={{marginTop:8,padding:"8px 12px",background:"#FFF8E1",border:"1px solid #FFD54F",borderRadius:8,fontSize:11,color:"#7a5800"}}>
-                  ⚠️ Prices shown are AI-generated estimates and may not reflect current retail prices. Always verify the actual price before purchasing.
+                  ⚠️ Prices shown are AI-generated estimates. Always verify on the retailer's site before purchasing.
                 </div>
               </div>
-
               <div style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"18px 20px"}}>
                 <div style={{fontWeight:500,fontSize:16,marginBottom:12}}>🧪 Ingredients</div>
-                {ingLoading && (
-                  <div style={{textAlign:"center",padding:"20px 0",color:"#999",fontSize:14}}>Looking up ingredients…</div>
-                )}
-                {!ingLoading && ingText === "unavailable" && (
+                {ingLoading&&<div style={{textAlign:"center",padding:"20px 0",color:"#999",fontSize:14}}>Looking up ingredients…</div>}
+                {!ingLoading&&ingText==="unavailable"&&(
                   <div style={{textAlign:"center",padding:"16px 0"}}>
                     <div style={{fontSize:28,marginBottom:8}}>😔</div>
-                    <div style={{fontSize:14,fontWeight:500,color:"#666"}}>We're sorry, the ingredients list is not available for this product.</div>
-                    <div style={{fontSize:12,marginTop:6,color:"#aaa"}}>Try checking the manufacturer's website for full ingredient details.</div>
+                    <div style={{fontSize:14,fontWeight:500,color:"#666"}}>Ingredients not available for this product.</div>
+                    <div style={{fontSize:12,marginTop:6,color:"#aaa"}}>Check the manufacturer's website for full details.</div>
                   </div>
                 )}
-                {!ingLoading && ingredientList.length>0 && (
+                {!ingLoading&&ingredientList.length>0&&(
                   <>
-                    {ingDisclaimer && (
-                      <div style={{padding:"8px 12px",background:"#FFF8E1",border:"1px solid #FFD54F",borderRadius:8,fontSize:12,color:"#7a5800",marginBottom:14}}>
-                        ⚠️ Ingredients sourced from AI — please verify on the manufacturer's website before making feeding decisions.
-                      </div>
-                    )}
+                    {ingDisclaimer&&<div style={{padding:"8px 12px",background:"#FFF8E1",border:"1px solid #FFD54F",borderRadius:8,fontSize:12,color:"#7a5800",marginBottom:14}}>⚠️ Ingredients sourced from AI — verify on the manufacturer's website.</div>}
                     <div style={{display:"flex",alignItems:"center",gap:14,padding:"12px 14px",background:scoreBg,borderRadius:10,marginBottom:16,border:`1px solid ${scoreColor}44`}}>
                       <div style={{width:48,height:48,borderRadius:"50%",border:`3px solid ${scoreColor}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                         <span style={{fontSize:15,fontWeight:700,color:scoreColor}}>{score}</span>
@@ -767,8 +783,8 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                       <div>
                         <div style={{fontWeight:600,color:scoreColor,fontSize:15}}>{scoreLabel} Quality</div>
                         <div style={{fontSize:12,color:"#666",marginTop:2}}>
-                          {good.length>0 && `✓ Contains ${good.slice(0,2).join(", ")}. `}
-                          {bad.length>0  && `⚠ Watch: ${bad.slice(0,2).join(", ")}.`}
+                          {good.length>0&&`✓ Contains ${good.slice(0,2).join(", ")}. `}
+                          {bad.length>0&&`⚠ Watch: ${bad.slice(0,2).join(", ")}.`}
                           {good.length===0&&bad.length===0&&"Review ingredients below."}
                         </div>
                       </div>
@@ -781,16 +797,74 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                       ))}
                     </div>
                     <div style={{fontSize:12,color:"#999",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{ingredientList.length} Ingredients</div>
-                    <div style={{lineHeight:1.9}}>
-                      {ingredientList.map((ing,i)=><IngredientBadge key={i} word={ing} index={i}/>)}
-                    </div>
-                    {sourceLabel && (
-                      <div style={{fontSize:11,color:"#bbb",marginTop:12}}>Source: {sourceLabel}</div>
-                    )}
+                    <div style={{lineHeight:1.9}}>{ingredientList.map((ing,i)=><IngredientBadge key={i} word={ing} index={i}/>)}</div>
+                    {sourceLabel&&<div style={{fontSize:11,color:"#bbb",marginTop:12}}>Source: {sourceLabel}</div>}
                   </>
                 )}
               </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Alerts Tab ── */}
+      {tab==="alerts" && (
+        <div>
+          <div style={{fontWeight:500,fontSize:16,marginBottom:4}}>🔔 Price Alerts</div>
+          <div style={{fontSize:13,color:"#666",marginBottom:16}}>Search for a product and tap "Set price alert" to get notified when it drops below your target price.</div>
+          {alerts.length===0 ? (
+            <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
+              <div style={{fontSize:40,marginBottom:8}}>🔔</div>
+              <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>No alerts set yet</div>
+              <div style={{fontSize:13,marginBottom:16}}>Search for a product and tap "Set price alert"</div>
+              <button onClick={()=>setTab("search")}
+                style={{padding:"10px 24px",borderRadius:12,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14}}>
+                Search Products
+              </button>
+            </div>
+          ) : (
+            <>
+              {visibleTriggered.length>0&&(
+                <div style={{marginBottom:16}}>
+                  <div style={{fontSize:12,color:"#2E7D32",fontWeight:500,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.05em"}}>🎉 Alerts Triggered</div>
+                  {visibleTriggered.map(({alert,prod,minPrice,bestStore})=>(
+                    <div key={alert.id} style={{background:"#E8F5E9",border:"1.5px solid #81C784",borderRadius:12,padding:"14px 16px",marginBottom:8}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                        <div>
+                          <div style={{fontWeight:500,fontSize:14,marginBottom:2}}>{prod.name}</div>
+                          <div style={{fontSize:13,color:"#2E7D32",fontWeight:500}}>Now ${minPrice.toFixed(2)} at {bestStore.store}</div>
+                          <div style={{fontSize:12,color:"#666",marginTop:2}}>Your target: under ${alert.targetPrice.toFixed(2)}</div>
+                        </div>
+                        <a href={getStoreLink(bestStore.store,prod.name)} target="_blank" rel="noopener noreferrer"
+                          style={{padding:"8px 14px",borderRadius:8,background:"#2E7D32",color:"white",textDecoration:"none",fontSize:12,fontWeight:500,flexShrink:0}}>
+                          Buy Now →
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div style={{fontSize:12,color:"#999",fontWeight:500,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.05em"}}>Active Alerts</div>
+              {alerts.map(alert=>(
+                <div key={alert.id} style={{background:"white",border:"1px solid #eee",borderRadius:12,padding:"14px 16px",marginBottom:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div>
+                    <div style={{fontWeight:500,fontSize:14,marginBottom:2}}>{alert.productName}</div>
+                    <div style={{fontSize:12,color:"#666"}}>{alert.brand} · {alert.pet==="dogs"?"🐶":"🐱"}</div>
+                    <div style={{fontSize:13,color:accent,fontWeight:500,marginTop:4}}>Alert below ${alert.targetPrice.toFixed(2)}</div>
+                  </div>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
+                    <button onClick={()=>deleteAlert(alert.id)}
+                      style={{padding:"5px 12px",borderRadius:8,background:"transparent",color:"#999",border:"1px solid #ddd",cursor:"pointer",fontSize:12}}>
+                      Remove
+                    </button>
+                    <button onClick={()=>{setSearch(alert.productName);setPet(alert.pet);setTab("search");searchProducts();}}
+                      style={{padding:"5px 12px",borderRadius:8,background:accentLight,color:accent,border:`1px solid ${accent}44`,cursor:"pointer",fontSize:12,fontWeight:500}}>
+                      Check now →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </>
           )}
         </div>
       )}
@@ -816,14 +890,11 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
               <input value={petForm.food} onChange={e=>setPetForm({...petForm,food:e.target.value})}
                 placeholder="Favourite food (e.g. Purina Pro Plan)"
                 style={{padding:"9px 12px",borderRadius:8,border:"1px solid #ddd",fontSize:14}}/>
-
-              {/* Dietary needs for pet profile */}
               <div>
                 <div style={{fontSize:13,color:"#666",marginBottom:6,fontWeight:500}}>🔬 Dietary needs (optional)</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                   {DIET_FILTERS.map(f=>(
-                    <button key={f.id} onClick={()=>togglePetDiet(f.id)}
-                      title={f.desc}
+                    <button key={f.id} onClick={()=>togglePetDiet(f.id)} title={f.desc}
                       style={{display:"flex",alignItems:"center",gap:4,padding:"5px 10px",borderRadius:16,
                         border:`1px solid ${petForm.dietaryNeeds.includes(f.id)?(f.id.startsWith("no_")?"#E24B4A":accent):"#e0e0e0"}`,
                         background:petForm.dietaryNeeds.includes(f.id)?(f.id.startsWith("no_")?"#FFEBEE":accentLight):"#fafafa",
@@ -834,7 +905,6 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                   ))}
                 </div>
               </div>
-
               <button onClick={addPet}
                 style={{padding:"9px 22px",borderRadius:8,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:14,width:"fit-content"}}>
                 {petSaved?"Saved! ✓":"Save Pet"}
@@ -868,17 +938,11 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
                   </button>
                 </div>
               </div>
-              {p.dietaryNeeds && p.dietaryNeeds.length>0&&(
+              {p.dietaryNeeds&&p.dietaryNeeds.length>0&&(
                 <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>
                   {p.dietaryNeeds.map(id=>{
                     const f=DIET_FILTERS.find(f=>f.id===id);
-                    return f?(
-                      <span key={id} style={{fontSize:11,padding:"2px 8px",borderRadius:8,
-                        background:id.startsWith("no_")?"#FFEBEE":"#E8F5E9",
-                        color:id.startsWith("no_")?"#C62828":"#2E7D32"}}>
-                        {f.icon} {f.label}
-                      </span>
-                    ):null;
+                    return f?(<span key={id} style={{fontSize:11,padding:"2px 8px",borderRadius:8,background:id.startsWith("no_")?"#FFEBEE":"#E8F5E9",color:id.startsWith("no_")?"#C62828":"#2E7D32"}}>{f.icon} {f.label}</span>):null;
                   })}
                 </div>
               )}
@@ -977,7 +1041,6 @@ Return ONLY valid JSON, no markdown, no explanation.` }]
       <div style={{marginTop:24,padding:"12px 16px",background:"#f5f5f5",borderRadius:10,fontSize:11,color:"#999",textAlign:"center",lineHeight:1.5}}>
         🐾 PawPrice earns a commission when you purchase through our links at no extra cost to you. Prices shown are estimates and may vary. Always verify pricing on the retailer's site.
       </div>
-
       <Analytics />
     </div>
   );
