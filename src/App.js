@@ -445,6 +445,44 @@ Return ONLY valid JSON, no markdown.` }]
     }));
   }
 
+  // ── Browse by Diet (no brand name needed) ──
+  async function browseByDiet() {
+    if (activeFilters.length === 0) return;
+    setLoading(true); setResults(null); setSelectedProduct(null); setError("");
+    const dietPrompt = buildDietPrompt(activeFilters);
+    try {
+      const response = await fetch("/api/search", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model:"claude-haiku-4-5-20251001", max_tokens:1500,
+          messages:[{ role:"user", content:`You are a pet food price comparison assistant. The user wants to browse ${pet} food by dietary requirements only — they have not specified a brand or product name.${dietPrompt}
+
+STRICT RULES:
+1. Return 4 real, popular products for ${pet} that genuinely meet ALL of the dietary requirements listed above.
+2. Only return products actually made for ${pet}. Never invent products.
+3. Every brand, product name, and size must be real and verifiable.
+4. Prices must be realistic. Never use 0 or null.
+5. Each product must include a "dietaryTags" array listing which apply: grain_free, limited_ingredient, hypoallergenic, high_protein, low_fat, low_sodium, weight_management, senior, puppy_kitten, no_chicken, no_beef, no_fish, no_grain_corn, no_dairy, organic, no_artificial.
+
+Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), typicalLow (number), typicalHigh (number), typicalAvg (number), and prices array with store and price for: ${STORES.join(", ")}.
+
+REQUIRED: Every product MUST include typicalLow, typicalHigh, and typicalAvg as numbers representing realistic US retail pricing.
+
+If no real products match, return: []
+Return ONLY valid JSON, no markdown.` }]
+        })
+      });
+      const data = await response.json();
+      if (!data.content) throw new Error(JSON.stringify(data));
+      const text  = data.content.map(c => c.text || "").join("");
+      const clean = text.replace(/```json|```/g,"").trim();
+      const parsed = JSON.parse(clean);
+      const valid = parsed.filter(p => p.prices && p.prices.length > 0 && p.prices.every(s => s.price > 0));
+      setResults(valid);
+    } catch(e) { setError("Browse failed: " + e.message); }
+    setLoading(false);
+  }
+
   async function searchProducts() {
     if (!search.trim()) return;
     setLoading(true); setResults(null); setSelectedProduct(null); setError("");
@@ -464,7 +502,7 @@ STRICT RULES:
 5. Prices must be realistic. Never use 0 or null.
 6. Each product must include a "dietaryTags" array listing which apply: grain_free, limited_ingredient, hypoallergenic, high_protein, low_fat, low_sodium, weight_management, senior, puppy_kitten, no_chicken, no_beef, no_fish, no_grain_corn, no_dairy, organic, no_artificial.
 
-Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), typicalLow (number: the typical lowest price this product sells for historically), typicalHigh (number: the typical highest price), typicalAvg (number: the typical average price), and prices array with store and price for: ${STORES.join(", ")}.
+Return a JSON array of up to 4 real matching products. Each must have: name, brand, type (Dry/Wet/Treats), size, stage (Puppy/Kitten/Adult/Senior), dietaryTags (array), typicalLow (number), typicalHigh (number), typicalAvg (number), and prices array with store and price for: ${STORES.join(", ")}.
 
 REQUIRED: Every product MUST include typicalLow, typicalHigh, and typicalAvg as numbers. These represent the realistic historical price range for that product size based on your knowledge of typical US retail pricing. Never omit these fields. Example: a 30lb bag of Purina Pro Plan typically sells between $38-$48, so typicalLow=38, typicalHigh=48, typicalAvg=43.
 
@@ -489,7 +527,6 @@ Return ONLY valid JSON, no markdown.` }]
   function getPriceTrend(prod) {
     const current = getMin(prod.prices);
     const maxP = getMax(prod.prices);
-    // Use AI-provided typical prices if available, otherwise estimate from price spread
     const typicalAvg  = prod.typicalAvg  || ((current + maxP) / 2);
     const typicalLow  = prod.typicalLow  || (current * 0.95);
     const typicalHigh = prod.typicalHigh || (maxP * 1.08);
@@ -567,7 +604,6 @@ Return ONLY valid JSON, no markdown.` }]
             <>
               <div style={{flex:1,position:"relative",margin:"0 16px"}}>
                 <video id="pawprice-scanner-video" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:16}} playsInline muted/>
-                {/* Scan frame overlay */}
                 <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:240,height:160,border:"3px solid #EF9F27",borderRadius:12,boxShadow:"0 0 0 9999px rgba(0,0,0,0.5)"}}>
                   <div style={{position:"absolute",top:-2,left:-2,width:24,height:24,borderTop:"4px solid #EF9F27",borderLeft:"4px solid #EF9F27",borderRadius:"4px 0 0 0"}}/>
                   <div style={{position:"absolute",top:-2,right:-2,width:24,height:24,borderTop:"4px solid #EF9F27",borderRight:"4px solid #EF9F27",borderRadius:"0 4px 0 0"}}/>
@@ -602,7 +638,6 @@ Return ONLY valid JSON, no markdown.` }]
 
           {scanResult && !scanLoading && (
             <div style={{flex:1,overflow:"auto",padding:"0 16px 16px"}}>
-              {/* Health Score */}
               <div style={{background:"white",borderRadius:16,padding:"20px",marginBottom:12}}>
                 <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
                   <div style={{
@@ -851,10 +886,24 @@ Return ONLY valid JSON, no markdown.` }]
                 )}
               </div>
 
-              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16,fontSize:12,color:"#666"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16,fontSize:12,color:"#666",flexWrap:"wrap"}}>
                 <span style={{background:accentLight,color:accent,padding:"3px 10px",borderRadius:10,fontWeight:500}}>✨ AI-powered</span>
                 <span>Real brands, estimated prices across 8 major retailers</span>
               </div>
+
+              {/* ── Browse by Diet Banner ── */}
+              {activeFilters.length > 0 && !search.trim() && (
+                <div style={{marginBottom:16,padding:"14px 16px",background:accentLight,border:`1.5px solid ${accent}44`,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:600,color:accent,marginBottom:2}}>Browse by dietary need</div>
+                    <div style={{fontSize:12,color:"#666"}}>Find {pet} food matching your filters — no brand name needed</div>
+                  </div>
+                  <button onClick={browseByDiet} disabled={loading}
+                    style={{flexShrink:0,padding:"9px 18px",borderRadius:10,background:accent,color:"white",border:"none",cursor:"pointer",fontWeight:500,fontSize:13,opacity:loading?0.7:1,whiteSpace:"nowrap"}}>
+                    {loading?"…":"Find Food →"}
+                  </button>
+                </div>
+              )}
 
               {error && <div style={{color:"#E24B4A",fontSize:14,marginBottom:12}}>{error}</div>}
 
@@ -871,7 +920,7 @@ Return ONLY valid JSON, no markdown.` }]
                 <div style={{textAlign:"center",padding:"3rem",color:"#666"}}>
                   <div style={{fontSize:40,marginBottom:8}}>{pet==="dogs"?"🐶":"🐱"}</div>
                   <div style={{fontSize:15,fontWeight:500,marginBottom:4}}>Search any pet food</div>
-                  <div style={{fontSize:13}}>Try "Blue Buffalo chicken adult" or use Dietary Filters for allergy-friendly results</div>
+                  <div style={{fontSize:13}}>Type a brand above, or tap <strong>Dietary Filters</strong> and use <strong>Find Food →</strong> to browse without knowing a brand</div>
                 </div>
               )}
 
@@ -963,7 +1012,6 @@ Return ONLY valid JSON, no markdown.` }]
                             <div style={{fontSize:11,color:accent,marginTop:2}}>Compare →</div>
                           </div>
                         </div>
-                        {/* Price trend badge */}
                         {trend && (
                           <div style={{margin:"8px 0 4px",padding:"7px 12px",background:trend.bg,borderRadius:8,display:"flex",alignItems:"center",gap:6}}>
                             <span style={{fontSize:13}}>{trend.icon}</span>
@@ -973,7 +1021,6 @@ Return ONLY valid JSON, no markdown.` }]
                             </div>
                           </div>
                         )}
-                        {/* Set Alert button */}
                         <div style={{marginTop:10,paddingTop:10,borderTop:"1px solid #f5f5f5",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                           <button onClick={()=>openAlertModal(prod)}
                             style={{display:"flex",alignItems:"center",gap:5,padding:"6px 12px",borderRadius:16,
